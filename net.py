@@ -48,7 +48,7 @@ class NNNEt():
         return h, o
 
     def train(self, x, label):
-        print("missing")
+        print("missing atm")
 
     def predict(self, x):
         _, o = self.forward(x)
