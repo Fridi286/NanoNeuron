@@ -1,4 +1,5 @@
 import os.path
+import random
 
 from NNNet.net import NNNet
 from concurrent.futures import ProcessPoolExecutor, as_completed
@@ -9,9 +10,18 @@ def run_config(cfg):
     return train_NNNet(**cfg)
 
 def test_diffrent():
+
+
     # verschiedene Hyperparameter-Kombinationen
     configs = [
-        {"hidden_size": 120, "learning_rate": 0.2, "seed": 42},
+        {"hidden_size": 120, "learning_rate": 0.2, "seed": random.randint(0, 1000)},
+        {"hidden_size": 65, "learning_rate": 0.2, "seed": random.randint(0, 1000)},
+        {"hidden_size": 120, "learning_rate": 0.1, "seed": random.randint(0, 1000)},
+        {"hidden_size": 65, "learning_rate": 0.1, "seed": random.randint(0, 1000)},
+        {"hidden_size": 120, "learning_rate": 0.01, "seed": random.randint(0, 1000)},
+        {"hidden_size": 65, "learning_rate": 0.01, "seed": random.randint(0, 1000)},
+        {"hidden_size": 120, "learning_rate": 0.02, "seed": random.randint(0, 1000)},
+        {"hidden_size": 65, "learning_rate": 0.02, "seed": random.randint(0, 1000)},
     ]
 
     # Anzahl Prozesse z.B. = Anzahl physischer Kerne
@@ -42,6 +52,7 @@ def train_NNNet(
         output_size=10,
         seed=42,
         learning_rate=0.1,
+        debug=False,
 ):
 
     train_image_path = "data/train-images.idx3-ubyte"
@@ -58,12 +69,14 @@ def train_NNNet(
     test_images = dl.load_images(test_image_path) / 255.0
     test_labels = dl.load_labels(test_label_path)
 
+    print(len(train_images))
+
     print("Create neuronal network NNNet")
     nnnet = NNNet(input_size=input_size, hidden_size=hidden_size, output_size=output_size, seed=seed, learning_rate=learning_rate)
 
     print("initializing training loop")
     EPOCHS = 3
-    TRAIN_SAMPLES = 5000
+    TRAIN_SAMPLES = 50000
 
     print("Start Training...")
 
@@ -82,8 +95,8 @@ def train_NNNet(
                 correct += 1
 
             # every 500 samples output current accuracy
-            if i % 500 == 0:
-                print(f"EPOCH: {epoch + 1}    ---    Training Accuracy: {correct / (i + 1):.2f}")
+            #if i % 500 == 0:
+            #    print(f"EPOCH: {epoch + 1}    ---    Training Accuracy: {correct / (i + 1):.2f}")
 
         # accuracry after each epoch
         print(f"EPOCH: {epoch + 1}    ---    Training Accuracy: {correct / TRAIN_SAMPLES:.2f}")
@@ -103,9 +116,9 @@ def train_NNNet(
 
     counter = 1
     if nnnet.seed:
-        path = f"NNNet_saves/nnnet_save{counter}_acc{accuracy}_hs{nnnet.hidden_size}_lr{nnnet.learning_rate}_seed{nnnet.seed}.npz"
+        path = f"NNNet_saves/{TRAIN_SAMPLES}samples/nnnet_save{counter}_acc{accuracy}_hs{nnnet.hidden_size}_lr{nnnet.learning_rate}_seed{nnnet.seed}.npz"
     else:
-        path = f"NNNet_saves/nnnet_save{counter}_acc{accuracy}_hs{nnnet.hidden_size}_lr{nnnet.learning_rate}_seedXXX.npz"
+        path = f"NNNet_saves/{TRAIN_SAMPLES}samples/nnnet_save{counter}_acc{accuracy}_hs{nnnet.hidden_size}_lr{nnnet.learning_rate}_seedXXX.npz"
 
     exists = True
     while exists:
@@ -113,9 +126,9 @@ def train_NNNet(
             counter += 1
         else:
             if nnnet.seed:
-                path = f"NNNet_saves/nnnet_save{counter}_acc{accuracy}_hs{nnnet.hidden_size}_lr{nnnet.learning_rate}_seed{nnnet.seed}.npz"
+                path = f"NNNet_saves/{TRAIN_SAMPLES}samples/nnnet_save{counter}_acc{accuracy}_hs{nnnet.hidden_size}_lr{nnnet.learning_rate}_seed{nnnet.seed}.npz"
             else:
-                path = f"NNNet_saves/nnnet_save{counter}_acc{accuracy}_hs{nnnet.hidden_size}_lr{nnnet.learning_rate}_seedXXX.npz"
+                path = f"NNNet_saves/{TRAIN_SAMPLES}samples/nnnet_save{counter}_acc{accuracy}_hs{nnnet.hidden_size}_lr{nnnet.learning_rate}_seedXXX.npz"
             exists = False
     nnnet.save_NNNet(path)
 
