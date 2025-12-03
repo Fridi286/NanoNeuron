@@ -14,8 +14,8 @@ from matplotlib.figure import Figure
 from NNNet.net import NNNet
 
 def load_model():
-    nn = NNNet(input_size=784, hidden_size=120, seed=52, learning_rate=0.2, output_size=10)
-    nn.load_NNNet("NNNet_saves/5000samples/nnnet_save1_acc0.8238_hs120_lr0.2_seed52.npz")
+    nn = NNNet(input_size=784, hidden_size=120, seed=52, learning_rate=0.25, output_size=10)
+    nn.load_NNNet("NNNet_saves/59999samples/nnnet_save1_acc0.9710_hs120_lr0.25_seed1000.npz")
     return nn
 
 nnnet = load_model()

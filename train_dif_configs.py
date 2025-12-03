@@ -14,14 +14,14 @@ def test_diffrent():
 
     # verschiedene Hyperparameter-Kombinationen
     configs = [
-        {"hidden_size": 120, "learning_rate": 0.2, "seed": random.randint(0, 1000)},
-        {"hidden_size": 65, "learning_rate": 0.2, "seed": random.randint(0, 1000)},
-        {"hidden_size": 120, "learning_rate": 0.1, "seed": random.randint(0, 1000)},
-        {"hidden_size": 65, "learning_rate": 0.1, "seed": random.randint(0, 1000)},
-        {"hidden_size": 120, "learning_rate": 0.01, "seed": random.randint(0, 1000)},
-        {"hidden_size": 65, "learning_rate": 0.01, "seed": random.randint(0, 1000)},
-        {"hidden_size": 120, "learning_rate": 0.02, "seed": random.randint(0, 1000)},
-        {"hidden_size": 65, "learning_rate": 0.02, "seed": random.randint(0, 1000)},
+        {"hidden_size": 120, "learning_rate": 0.25, "seed": random.randint(0, 1000)},
+        {"hidden_size": 120, "learning_rate": 0.3, "seed": random.randint(0, 1000)},
+        {"hidden_size": 130, "learning_rate": 0.2, "seed": random.randint(0, 1000)},
+        {"hidden_size": 140, "learning_rate": 0.2, "seed": random.randint(0, 1000)},
+        {"hidden_size": 150, "learning_rate": 0.2, "seed": random.randint(0, 1000)},
+        {"hidden_size": 160, "learning_rate": 0.2, "seed": random.randint(0, 1000)},
+        {"hidden_size": 170, "learning_rate": 0.2, "seed": random.randint(0, 1000)},
+        {"hidden_size": 190, "learning_rate": 0.2, "seed": random.randint(0, 1000)},
     ]
 
     # Anzahl Prozesse z.B. = Anzahl physischer Kerne
@@ -76,7 +76,7 @@ def train_NNNet(
 
     print("initializing training loop")
     EPOCHS = 3
-    TRAIN_SAMPLES = 50000
+    TRAIN_SAMPLES = 59999
 
     print("Start Training...")
 
