@@ -47,3 +47,11 @@ class NNNEt():
         ]
         return h, o
 
+    def train(self, x, label):
+        print("missing")
+
+    def predict(self, x):
+        _, o = self.forward(x)
+        # Theoretically the right number should have the highest actication
+        return max(range(self.output_size))
+
