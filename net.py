@@ -4,8 +4,7 @@ import math
 def rand():
     return random.uniform(-0.1, 0.1)
 
-
-class NNNEt():
+class NNNet():
 
     # defining random weight for each loayer and ech neuron and initilaizing the neuronal network
     def __init__(self, input_size, hidden_size, output_size):
@@ -53,5 +52,5 @@ class NNNEt():
     def predict(self, x):
         _, o = self.forward(x)
         # Theoretically the right number should have the highest actication
-        return max(range(self.output_size))
+        return max(range(self.output_size), key=lambda i: o[i])
 
