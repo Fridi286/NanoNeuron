@@ -24,3 +24,26 @@ class NNNEt():
         self.b2 = [0.0 for _ in range(self.output_size)]
 
         self.learning_rate = 0.1
+
+    # translates big values into values between 0 and 1
+    def sigmoid(self, x):
+        return 1 / (1 + math.exp(-x))
+
+    # calculates the weighted sum of all input weights
+    def dot(self, a, b):
+        return sum(x * y for x, y in zip(a, b))
+
+    # forward propagation
+    def forward(self, x):
+        # Calculates activations for each neuron in the first hidden layer
+        h = [
+            self.sigmoid(self.dot(self.W1[i], x) + self.b1[i])
+            for i in range(self.hidden_size)
+        ]
+        # Calculates activations for each neuron in the output layer
+        o = [
+            self.sigmoid(self.dot(self.W2[i], h) + self.b2[i])
+            for i in range(self.output_size)
+        ]
+        return h, o
+
