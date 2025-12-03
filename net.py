@@ -6,7 +6,15 @@ import math
 class NNNet():
 
     # defining random weight for each loayer and ech neuron and initilaizing the neuronal network
-    def __init__(self, input_size, hidden_size, output_size, seed=None):
+    def __init__(
+            self,
+            input_size,
+            hidden_size,
+            output_size,
+            seed=None,
+            learning_rate = 0.1
+    ):
+
         random.seed(seed)
         self.input_size = input_size
         self.hidden_size = hidden_size
@@ -22,7 +30,7 @@ class NNNet():
                    for _ in range(self.output_size)]
         self.b2 = [0.0 for _ in range(self.output_size)]
 
-        self.learning_rate = 0.1
+        self.learning_rate = learning_rate
 
     def rand(self):
         return random.uniform(-0.1, 0.1)
