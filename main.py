@@ -1,3 +1,5 @@
+import os.path
+
 import net
 from net import NNNet as NNNet
 import data_loader as dl
@@ -17,7 +19,7 @@ test_images = dl.load_images(test_image_path) / 255.0
 test_labels = dl.load_labels(test_label_path)
 
 print("Create neuronal network NNNet")
-nnnet = NNNet(input_size=784, hidden_size=16, output_size=10, seed=10, learning_rate=0.1)
+nnnet = NNNet(input_size=784, hidden_size=30, output_size=10, seed=42, learning_rate=0.1)
 
 print("initializing training loop")
 EPOCHS = 3
@@ -54,5 +56,33 @@ correct = 0
 for i in range(len(test_images)):
     if nnnet.predict(test_images[i]) == test_labels[i]:
         correct += 1
+accuracy = f"{correct / len(test_images):.4f}"
+print(f"Final Test Accuracy: {accuracy}")
 
-print(f"Final Test Accuracy: {correct / len(test_images):.4f}")
+
+
+
+# ------------------ Save to File -------------------------
+
+
+
+
+
+counter = 1
+if nnnet.seed:
+    path = f"NNNet_saves/nnnet_save{counter}_acc{accuracy}_hs{nnnet.hidden_size}_lr{nnnet.learning_rate}_seed{nnnet.seed}.npz"
+else:
+    path = f"NNNet_saves/nnnet_save{counter}_acc{accuracy}_hs{nnnet.hidden_size}_lr{nnnet.learning_rate}_seedXXX.npz"
+
+
+exists = True
+while exists:
+    if os.path.exists(path):
+        if nnnet.seed:
+            path = f"NNNet_saves/nnnet_save{counter}_acc{accuracy}_hs{nnnet.hidden_size}_lr{nnnet.learning_rate}_seed{nnnet.seed}.npz"
+        else:
+            path = f"NNNet_saves/nnnet_save{counter}_acc{accuracy}_hs{nnnet.hidden_size}_lr{nnnet.learning_rate}_seedXXX.npz"
+        counter += 1
+    else:
+        exists = False
+nnnet.save_NNNet(path)

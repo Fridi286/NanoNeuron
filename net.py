@@ -1,6 +1,7 @@
 import random
 import math
 
+import numpy as np
 
 
 class NNNet():
@@ -12,9 +13,11 @@ class NNNet():
             hidden_size,
             output_size,
             seed=None,
-            learning_rate = 0.01
+            learning_rate = 0.01,
+            pre_trained = None,
     ):
 
+        self.seed = seed
         random.seed(seed)
         self.input_size = input_size
         self.hidden_size = hidden_size
@@ -29,6 +32,9 @@ class NNNet():
         self.W2 = [[self.rand() for _ in range(self.hidden_size)]
                    for _ in range(self.output_size)]
         self.b2 = [0.0 for _ in range(self.output_size)]    #biases for w2
+
+        if pre_trained:
+            self.load_NNNet(pre_trained)
 
         self.learning_rate = learning_rate
 
@@ -77,7 +83,7 @@ class NNNet():
             s = sum(error_out[j] * self.W2[j][i] for j in range(self.output_size))  # sum of all errors of all output neurons, in relation t the weight
             error_hidden.append(s * h[i] * (1-h[i]))                                  # using derivation of sigmoid
 
-        # now we need to update both weights W1 and W2
+        # now we need to update both weights W1 and W2 using gradient descent
 
         #   updating W2
         for i in range(self.output_size):
@@ -96,3 +102,12 @@ class NNNet():
         # Theoretically the right number should have the highest actication
         return max(range(self.output_size), key=lambda i: o[i])
 
+    def save_NNNet(self, path):
+        np.savez(path, W1=self.W1, W2=self.W2, b1=self.b1, b2=self.b2)
+
+    def load_NNNet(self, path):
+        data = np.load(path)
+        self.W1 = data["W1"]
+        self.W2 = data["W2"]
+        self.b1 = data["b1"]
+        self.b2 = data["b2"]
