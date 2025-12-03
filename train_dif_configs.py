@@ -1,7 +1,41 @@
 import os.path
 
-from NNNet.net import NNNet as NNNet
+from NNNet.net import NNNet
+from train_dif_configs import train_NNNet
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from NNNet import data_loader as dl
+
+
+def run_config(cfg):
+    return train_NNNet(**cfg)
+
+def test_diffrent():
+    # verschiedene Hyperparameter-Kombinationen
+    configs = [
+        {"hidden_size": 20, "learning_rate": 0.1, "seed": 52},
+    ]
+
+    # Anzahl Prozesse z.B. = Anzahl physischer Kerne
+    max_workers = 9
+
+    results = []
+    with ProcessPoolExecutor(max_workers=max_workers) as executor:
+        futures = [executor.submit(run_config, cfg) for cfg in configs]
+
+        for future in as_completed(futures):
+            res = future.result()
+            results.append(res)
+            print(
+                f"Fertig: hs={res['hidden_size']}, lr={res['learning_rate']}, "
+                f"seed={res['seed']} → acc={res['accuracy']:.4f}, file={res['path']}"
+            )
+
+    print("\nAlle Runs fertig:")
+    for r in results:
+        print(
+            f"hs={r['hidden_size']}, lr={r['learning_rate']}, "
+            f"seed={r['seed']} → acc={r['accuracy']:.4f}"
+        )
 
 def train_NNNet(
         input_size=784,

@@ -102,6 +102,16 @@ class NNNet():
         # Theoretically the right number should have the highest actication
         return max(range(self.output_size), key=lambda i: o[i])
 
+    def predict_debug(self, x):
+        _, o = self.forward(x)
+        # Theoretically the right number should have the highest actication
+        if True:
+            for i in range(self.output_size):
+                print(f"For {i}: Probability: {o[i]}")
+            print("\n\n\n\n")
+
+        return max(range(self.output_size), key=lambda i: o[i]), o
+
     def save_NNNet(self, path):
         np.savez(path, W1=self.W1, W2=self.W2, b1=self.b1, b2=self.b2)
 
