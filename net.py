@@ -12,7 +12,7 @@ class NNNet():
             hidden_size,
             output_size,
             seed=None,
-            learning_rate = 0.1
+            learning_rate = 0.01
     ):
 
         random.seed(seed)
