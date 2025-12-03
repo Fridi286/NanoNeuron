@@ -77,12 +77,12 @@ def train_NNNet(
     exists = True
     while exists:
         if os.path.exists(path):
+            counter += 1
+        else:
             if nnnet.seed:
                 path = f"NNNet_saves/nnnet_save{counter}_acc{accuracy}_hs{nnnet.hidden_size}_lr{nnnet.learning_rate}_seed{nnnet.seed}.npz"
             else:
                 path = f"NNNet_saves/nnnet_save{counter}_acc{accuracy}_hs{nnnet.hidden_size}_lr{nnnet.learning_rate}_seedXXX.npz"
-            counter += 1
-        else:
             exists = False
     nnnet.save_NNNet(path)
 
