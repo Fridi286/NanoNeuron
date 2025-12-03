@@ -10,7 +10,7 @@ from NNNet.net import NNNet  # ggf. an dein Projekt anpassen
 
 def load_model():
     nn = NNNet(input_size=784, hidden_size=65, seed=52, learning_rate=0.2, output_size=10)
-    nn.load_NNNet("NNNet_saves/nnnet_save1_acc0.7590_hs65_lr0.2_seed52.npz")
+    nn.load_NNNet("NNNet_saves/nnnet_save1_acc0.8101_hs100_lr0.2_seed52.npz")
     return nn
 
 

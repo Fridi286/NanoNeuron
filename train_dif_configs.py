@@ -1,7 +1,6 @@
 import os.path
 
 from NNNet.net import NNNet
-from train_dif_configs import train_NNNet
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from NNNet import data_loader as dl
 
@@ -12,7 +11,11 @@ def run_config(cfg):
 def test_diffrent():
     # verschiedene Hyperparameter-Kombinationen
     configs = [
-        {"hidden_size": 20, "learning_rate": 0.1, "seed": 52},
+        {"hidden_size": 100, "learning_rate": 0.2, "seed": 52},
+        {"hidden_size": 105, "learning_rate": 0.2, "seed": 52},
+        {"hidden_size": 110, "learning_rate": 0.2, "seed": 52},
+        {"hidden_size": 115, "learning_rate": 0.2, "seed": 52},
+        {"hidden_size": 120, "learning_rate": 0.2, "seed": 52},
     ]
 
     # Anzahl Prozesse z.B. = Anzahl physischer Kerne
@@ -120,4 +123,5 @@ def train_NNNet(
             exists = False
     nnnet.save_NNNet(path)
 
-
+if __name__ == "__main__":
+    test_diffrent()
