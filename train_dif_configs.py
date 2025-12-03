@@ -11,11 +11,7 @@ def run_config(cfg):
 def test_diffrent():
     # verschiedene Hyperparameter-Kombinationen
     configs = [
-        {"hidden_size": 100, "learning_rate": 0.2, "seed": 52},
-        {"hidden_size": 105, "learning_rate": 0.2, "seed": 52},
-        {"hidden_size": 110, "learning_rate": 0.2, "seed": 52},
-        {"hidden_size": 115, "learning_rate": 0.2, "seed": 52},
-        {"hidden_size": 120, "learning_rate": 0.2, "seed": 52},
+        {"hidden_size": 120, "learning_rate": 0.2, "seed": 42},
     ]
 
     # Anzahl Prozesse z.B. = Anzahl physischer Kerne

@@ -105,7 +105,7 @@ class NNNet():
     def predict_debug(self, x):
         _, o = self.forward(x)
         # Theoretically the right number should have the highest actication
-        if True:
+        if False:
             for i in range(self.output_size):
                 print(f"For {i}: Probability: {o[i]}")
             print("\n\n\n\n")
