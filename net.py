@@ -23,12 +23,12 @@ class NNNet():
         # random weighted inputs for hidden layer
         self.W1 = [[self.rand() for _ in range(self.input_size)]
                    for _ in range(self.hidden_size)]
-        self.b1 = [0.0 for _ in range(self.hidden_size)]
+        self.b1 = [0.0 for _ in range(self.hidden_size)]    #biases for w1
 
         # random weighted inputs for output layer
         self.W2 = [[self.rand() for _ in range(self.hidden_size)]
                    for _ in range(self.output_size)]
-        self.b2 = [0.0 for _ in range(self.output_size)]
+        self.b2 = [0.0 for _ in range(self.output_size)]    #biases for w2
 
         self.learning_rate = learning_rate
 
@@ -57,8 +57,39 @@ class NNNet():
         ]
         return h, o
 
+    # Backpropagation
     def train(self, x, label):
-        print("missing atm")
+        h, o = self.forward(x)
+
+        # creating ideal goal vector, the right bit is on 1
+        y = [0] * 10
+        y[label] = 1
+
+        #calculate error in the output layer
+        # return a list of 10 values which list the error for every output neuron
+        error_out = [
+            (o[i] - y[i]) * o[i] * (1 - o[i]) for i in range(self.output_size)      # using derivation of sigmoid
+        ]
+
+        #calculating the impact each hidden layer neuron has to the given output
+        error_hidden = []
+        for i in range(self.hidden_size):
+            s = sum(error_out[j] * self.W2[j][i] for j in range(self.output_size))  # sum of all errors of all output neurons, in relation t the weight
+            error_hidden.append(s * h[i] * (1-h[i]))                                  # using derivation of sigmoid
+
+        # now we need to update both weights W1 and W2
+
+        #   updating W2
+        for i in range(self.output_size):
+            for j in range(self.hidden_size):
+                self.W2[i][j] -= self.learning_rate * error_out[i] * h[j]
+            self.b2[i] -= self.learning_rate * error_out[i]
+
+        #   updating W1
+        for i in range(16):
+            for j in range(784):
+                self.W1[i][j] -= self.learning_rate * error_hidden[i] * x[j]
+            self.b1[i] -= self.learning_rate * error_hidden[i]
 
     def predict(self, x):
         _, o = self.forward(x)
