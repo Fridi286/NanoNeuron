@@ -62,7 +62,7 @@ class NNNet():
         h, o = self.forward(x)
 
         # creating ideal goal vector, the right bit is on 1
-        y = [0] * 10
+        y = [0] * self.output_size
         y[label] = 1
 
         #calculate error in the output layer
@@ -86,8 +86,8 @@ class NNNet():
             self.b2[i] -= self.learning_rate * error_out[i]
 
         #   updating W1
-        for i in range(16):
-            for j in range(784):
+        for i in range(self.output_size):
+            for j in range(self.hidden_size):
                 self.W1[i][j] -= self.learning_rate * error_hidden[i] * x[j]
             self.b1[i] -= self.learning_rate * error_hidden[i]
 
