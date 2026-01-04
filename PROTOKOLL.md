@@ -1,7 +1,7 @@
 # NanoNeuron - Projektprotokoll
 
 ## Inhaltsverzeichnis
-1. [Projektübersicht](#projektübersicht)
+1. [Projektübersicht](#projektuebersicht)
 2. [Funktionen des Neuronalen Netzes](#funktionen-des-neuronalen-netzes)
 3. [Implementierungsvergleich: Ohne vs. Mit NumPy](#implementierungsvergleich-ohne-vs-mit-numpy)
 4. [Auswertung der trainierten Netze](#auswertung-der-trainierten-netze)
@@ -9,7 +9,7 @@
 
 ---
 
-## Projektübersicht
+## <a name="projektuebersicht"></a>Projektübersicht
 
 Das NanoNeuron-Projekt implementiert ein einfaches neuronales Netzwerk zur Erkennung handgeschriebener Ziffern (0-9) aus dem MNIST-Dataset. Das Projekt demonstriert sowohl eine native Python-Implementierung als auch eine optimierte NumPy-Variante.
 
