@@ -305,11 +305,91 @@ epochs = 3              # Durchläufe durch den Datensatz
    - Für jedes Bild: Forward Pass → Backpropagation → Gewichtsaktualisierung
 4. **Evaluation**: Test auf separatem Testdatensatz
 
-### Erreichte Genauigkeit
+### Experimentelle Trainingsergebnisse
 
-Typische Ergebnisse nach 3 Epochen:
-- Hidden Size 30, Learning Rate 0.1: ~90-92% Genauigkeit
-- Hidden Size 120-170, Learning Rate 0.2-0.3: ~93-95% Genauigkeit
+Das Projekt enthält **68 trainierte Modelle** mit verschiedenen Hyperparameter-Kombinationen, gespeichert im `NNNet_saves` Verzeichnis. Diese Modelle wurden systematisch mit unterschiedlichen Konfigurationen trainiert, um die optimalen Parameter zu finden.
+
+#### Übersicht der Trainingsdaten
+
+Die Modelle wurden mit drei verschiedenen Trainingsdatenmengen trainiert:
+
+- **5.000 Samples**: 52 Modelle (Schnelle Experimente)
+- **50.000 Samples**: 8 Modelle (Mittlere Datenmenge)
+- **59.999 Samples**: 8 Modelle (Maximale Datenmenge)
+
+**Getestete Parameter-Bereiche:**
+- Hidden Layer Größe: 16 - 190 Neuronen
+- Learning Rate: 0.01 - 0.3
+- Genauigkeitsbereich: 0.02% - 97.10%
+
+#### Visualisierung der Trainingsergebnisse
+
+![Training Results Analysis](training_results_analysis.png)
+
+Die Grafik zeigt:
+1. **Oben links**: Boxplot der Genauigkeit nach Trainingsdatenmenge - zeigt deutlich, dass mehr Trainingsdaten zu höherer und konsistenterer Genauigkeit führen
+2. **Oben rechts**: Einfluss der Hidden Layer Größe auf die Genauigkeit (59.999 Samples)
+3. **Unten links**: Einfluss der Learning Rate auf die Genauigkeit (59.999 Samples)
+4. **Unten rechts**: Top 10 beste Modelle mit ihren jeweiligen Hyperparametern
+
+#### Detaillierte Ergebnisse nach Trainingsgröße
+
+**5.000 Trainingssamples (52 Modelle):**
+- Genauigkeitsbereich: 0.02% - 91.23%
+- Bestes Modell: 91.23% (Hidden Size: 65, Learning Rate: 0.2)
+- Durchschnittliche Genauigkeit: ~65%
+- Beobachtung: Hohe Varianz in der Genauigkeit, stark abhängig von Hyperparametern
+
+**50.000 Trainingssamples (8 Modelle):**
+- Genauigkeitsbereich: 91.55% - 96.61%
+- Bestes Modell: 96.61% (Hidden Size: 120, Learning Rate: 0.2)
+- Durchschnittliche Genauigkeit: ~94.5%
+- Beobachtung: Deutlich konsistentere und höhere Genauigkeit
+
+**59.999 Trainingssamples (8 Modelle):**
+- Genauigkeitsbereich: 96.82% - 97.10%
+- Bestes Modell: 97.10% (Hidden Size: 120, Learning Rate: 0.3)
+- Durchschnittliche Genauigkeit: ~97.0%
+- Beobachtung: Sehr hohe und stabile Genauigkeit
+
+#### Top 10 Beste Modelle
+
+| Rang | Accuracy | Hidden Size | Learning Rate | Samples | Datei |
+|------|----------|-------------|---------------|---------|-------|
+| 1 | 97.10% | 120 | 0.30 | 59,999 | nnnet_save1_acc0.9710_hs120_lr0.3_seed63.npz |
+| 2 | 97.10% | 120 | 0.25 | 59,999 | nnnet_save1_acc0.9710_hs120_lr0.25_seed1000.npz |
+| 3 | 97.07% | 170 | 0.20 | 59,999 | nnnet_save1_acc0.9707_hs170_lr0.2_seed762.npz |
+| 4 | 97.03% | 140 | 0.20 | 59,999 | nnnet_save1_acc0.9703_hs140_lr0.2_seed821.npz |
+| 5 | 97.02% | 150 | 0.20 | 59,999 | nnnet_save1_acc0.9702_hs150_lr0.2_seed657.npz |
+| 6 | 97.01% | 160 | 0.20 | 59,999 | nnnet_save1_acc0.9701_hs160_lr0.2_seed752.npz |
+| 7 | 96.97% | 190 | 0.20 | 59,999 | nnnet_save1_acc0.9697_hs190_lr0.2_seed294.npz |
+| 8 | 96.82% | 130 | 0.20 | 59,999 | nnnet_save1_acc0.9682_hs130_lr0.2_seed305.npz |
+| 9 | 96.61% | 120 | 0.20 | 50,000 | nnnet_save1_acc0.9661_hs120_lr0.2_seed485.npz |
+| 10 | 96.08% | 65 | 0.20 | 50,000 | nnnet_save1_acc0.9608_hs65_lr0.2_seed355.npz |
+
+#### Wichtige Erkenntnisse aus den Experimenten
+
+1. **Trainingsdatenmenge ist entscheidend**: 
+   - Mit 5.000 Samples: ~91% maximale Genauigkeit
+   - Mit 50.000 Samples: ~96.6% maximale Genauigkeit  
+   - Mit 59.999 Samples: ~97.1% maximale Genauigkeit
+   - **Fazit**: Mehr Trainingsdaten führen zu signifikant besseren Ergebnissen
+
+2. **Optimale Hidden Layer Größe**:
+   - Sweet Spot liegt bei 120-170 Neuronen
+   - Zu klein (< 30): Unzureichende Kapazität zur Mustererkennung
+   - Optimal (120-170): Beste Balance zwischen Kapazität und Overfitting
+   - Zu groß (> 170): Nur minimale Verbesserung, höherer Rechenaufwand
+
+3. **Learning Rate**:
+   - Zu niedrig (0.01-0.05): Langsames Lernen, niedrigere Genauigkeit nach 3 Epochen
+   - Optimal (0.2-0.3): Schnelle Konvergenz, hohe Genauigkeit
+   - Beobachtung: Mit 59.999 Samples funktioniert auch lr=0.3 sehr gut
+
+4. **Konsistenz**:
+   - Bei mehr Trainingsdaten sind die Ergebnisse konsistenter
+   - Mit 59.999 Samples liegen alle Modelle über 96.8% Genauigkeit
+   - Bei 5.000 Samples schwankt die Genauigkeit stark (0.02% - 91.23%)
 
 ## Zusammenfassung der Vorteile von NumPy
 
@@ -342,7 +422,14 @@ NanoNeuron/
 Das NanoNeuron-Projekt demonstriert eindrucksvoll die Vorteile von NumPy für maschinelles Lernen:
 
 - Die **NumPy-Implementation** (net.py) ist kürzer, schneller und fehlerresistenter
-- Die **reine Python-Implementation** (net_old.py) ist lehrreich, um die zugrunde liegenden Algorithmen zu verstehen
+- Die **reine Python-Implementation** (net_old.py) ist lehrreich, um die zugrunde liegenden Algorithmen zu verstehen, enthält aber Implementierungsfehler
 - Für produktive Anwendungen ist NumPy unverzichtbar aufgrund der massiven Performance-Vorteile
 
-Das Projekt erreicht trotz seiner Einfachheit eine beachtliche Genauigkeit von ~93-95% bei der Erkennung handgeschriebener Ziffern und eignet sich hervorragend zum Verständnis der Grundlagen neuronaler Netzwerke.
+**Erreichte Ergebnisse:**
+- Mit 59.999 Trainingssamples: **Bis zu 97.10% Genauigkeit** bei der Erkennung handgeschriebener Ziffern
+- **68 trainierte Modelle** mit verschiedenen Hyperparameter-Kombinationen dokumentieren systematisch den Einfluss von:
+  - Trainingsdatenmenge (5.000 - 59.999 Samples)
+  - Hidden Layer Größe (16 - 190 Neuronen)
+  - Learning Rate (0.01 - 0.3)
+
+Das Projekt eignet sich hervorragend zum Verständnis der Grundlagen neuronaler Netzwerke und zeigt praktisch, wie Hyperparameter-Tuning die Modellleistung beeinflusst.
