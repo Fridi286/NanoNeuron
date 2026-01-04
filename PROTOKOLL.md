@@ -267,9 +267,12 @@ for i in range(self.output_size):  # ← FALSCH (sollte hidden_size sein)
 ```
 
 **Problem**: 
-- W1 hat die Dimensionen (hidden_size, input_size)
-- Der Code iteriert aber über (output_size, hidden_size)
-- Dies führt zu falschen Array-Zugriffen und falschem Training
+- W1 hat die Dimensionen (hidden_size, input_size), also z.B. (30, 784)
+- Der Code iteriert aber über (output_size, hidden_size), also (10, 30)
+- Dies aktualisiert nur die ersten 10 Zeilen von W1 statt alle 30 Zeilen
+- Die verbleibenden 20 Zeilen werden nie trainiert
+- Zudem wird x[j] verwendet, wo j nur bis 30 läuft, statt bis 784 (input_size)
+- Dies führt zu falschem Training und schlechterer Netzwerkleistung
 
 **Korrektur**:
 ```python
