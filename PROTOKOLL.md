@@ -15,10 +15,7 @@ Das NanoNeuron-Projekt implementiert ein einfaches neuronales Netzwerk zur Erken
 
 ### Netzwerkarchitektur
 
-```
-Input Layer (784 Neuronen)  →  Hidden Layer (variabel)  →  Output Layer (10 Neuronen)
-     28x28 Pixel                  Sigmoid-Aktivierung         Sigmoid-Aktivierung
-```
+![Netzwerkarchitektur](images/network_architecture.png)
 
 - **Input Layer**: 784 Neuronen (28×28 Pixel Grauwertbilder)
 - **Hidden Layer**: Variable Anzahl (z.B. 30, 65, 120, 170 Neuronen)
@@ -59,15 +56,8 @@ def sigmoid(self, x):
 - Ableitung: `sigmoid(x) * (1 - sigmoid(x))`
 
 **Visualisierung**:
-```
-     1.0 |         ╭────────
-         |       ╭─╯
-     0.5 |     ╭─┤
-         |   ╭─╯  
-     0.0 |───╯
-         └─────────────────
-        -5    0    5
-```
+
+![Sigmoid-Aktivierungsfunktion](images/sigmoid_function.png)
 
 ### 3. Forward Propagation (`forward`)
 
@@ -263,13 +253,8 @@ Das Projekt enthält 69 trainierte Modelle mit verschiedenen Konfigurationen üb
 #### 1. Training mit 5000 Samples
 
 **Durchschnittliche Genauigkeit nach Lernrate**:
-```
-Learning Rate 0.01: ████████████████████ 0.4878 (48.78%)
-Learning Rate 0.02: ████████████████████████████ 0.8367 (83.67%)
-Learning Rate 0.05: ███████████████ 0.4423 (44.23%)
-Learning Rate 0.10: █████████████████ 0.5317 (53.17%)
-Learning Rate 0.20: ████████████████████████ 0.7618 (76.18%)
-```
+
+![Learning Rate vs Accuracy (5000 Samples)](images/lr_accuracy_5000samples.png)
 
 **Bestes Modell**:
 - **Genauigkeit**: 91.23%
@@ -286,12 +271,8 @@ Learning Rate 0.20: ████████████████████
 #### 2. Training mit 50000 Samples
 
 **Durchschnittliche Genauigkeit nach Lernrate**:
-```
-Learning Rate 0.01: ██████████████████████████ 0.9158 (91.58%)
-Learning Rate 0.02: ███████████████████████████ 0.9297 (92.97%)
-Learning Rate 0.10: ████████████████████████████ 0.9549 (95.49%)
-Learning Rate 0.20: ██████████████████████████████ 0.9634 (96.34%)
-```
+
+![Learning Rate vs Accuracy (50000 Samples)](images/lr_accuracy_50000samples.png)
 
 **Bestes Modell**:
 - **Genauigkeit**: 96.61%
@@ -308,11 +289,8 @@ Learning Rate 0.20: ████████████████████
 #### 3. Training mit 59999 Samples (Fast vollständig)
 
 **Durchschnittliche Genauigkeit nach Lernrate**:
-```
-Learning Rate 0.20: ████████████████████████████ 0.9699 (96.99%)
-Learning Rate 0.25: █████████████████████████████ 0.9710 (97.10%)
-Learning Rate 0.30: █████████████████████████████ 0.9710 (97.10%)
-```
+
+![Learning Rate vs Accuracy (59999 Samples)](images/lr_accuracy_59999samples.png)
 
 **Beste Modelle** (2 Modelle mit gleicher Genauigkeit):
 1. **Modell A**:
@@ -343,21 +321,7 @@ Learning Rate 0.30: ████████████████████
 
 ### Grafische Darstellung: Genauigkeit vs. Trainingsgröße
 
-```
-Accuracy (%)
-100% |                                    ●───● (97.10%)
-     |                               ●─── (96.61%)
- 95% |                          ●───
-     |                     ●───
- 90% |                ●─── (91.23%)
-     |           ●───
- 85% |      ●───
-     | ●───
- 80% |
-     └──────────────────────────────────────────────
-        5K      10K     20K     30K    50K    60K
-                    Training Samples
-```
+![Genauigkeit vs Trainingsdatengröße](images/accuracy_vs_samples.png)
 
 ### Einfluss der Hyperparameter
 
@@ -375,17 +339,17 @@ Accuracy (%)
 
 **Erkenntnis**: 120-170 Neuronen im Hidden Layer sind optimal. Mehr Neuronen bringen keinen signifikanten Vorteil.
 
+![Einfluss der Hidden Layer Größe](images/hidden_size_impact.png)
+
 #### Learning Rate
 
 **Optimale Lernraten nach Datensatzgröße**:
 
-```
-Datensatzgröße    Optimale LR    Begründung
-──────────────────────────────────────────────────
-5,000 Samples     0.02 - 0.20    Hohe Varianz
-50,000 Samples    0.10 - 0.20    Stabilere Ergebnisse
-59,999 Samples    0.20 - 0.30    Beste Konvergenz
-```
+| Datensatzgröße | Optimale LR | Begründung |
+|----------------|-------------|------------|
+| 5,000 Samples  | 0.02 - 0.20 | Hohe Varianz |
+| 50,000 Samples | 0.10 - 0.20 | Stabilere Ergebnisse |
+| 59,999 Samples | 0.20 - 0.30 | Beste Konvergenz |
 
 ### Alle gespeicherten Modelle (Top 10 nach Genauigkeit)
 
@@ -431,14 +395,14 @@ Datensatzgröße    Optimale LR    Begründung
 #### 3. NumPy vs. Native Python
 
 Die NumPy-Implementierung ist klar überlegen:
-- ✅ 10-50× schnellere Ausführung
-- ✅ Kompakterer, wartbarerer Code
-- ✅ Bessere Skalierbarkeit
-- ✅ Numerische Stabilität
+- 10-50× schnellere Ausführung
+- Kompakterer, wartbarerer Code
+- Bessere Skalierbarkeit
+- Numerische Stabilität
 
 Die native Python-Implementierung ist wertvoll für:
-- 📚 Lernzwecke (besseres Algorithmenverständnis)
-- 🔍 Debugging (explizite Operationen)
+- Lernzwecke (besseres Algorithmenverständnis)
+- Debugging (explizite Operationen)
 
 #### 4. Netzwerk-Performance
 
@@ -489,10 +453,10 @@ TRAIN_SAMPLES = 59999       # Maximale Daten nutzen
 
 Das NanoNeuron-Projekt demonstriert erfolgreich:
 
-1. ✅ Implementierung eines funktionsfähigen neuronalen Netzes
-2. ✅ Vergleich zwischen nativer Python- und NumPy-Implementierung
-3. ✅ Systematische Hyperparameter-Optimierung
-4. ✅ Erreichen von ~97% Genauigkeit auf MNIST
+1. Implementierung eines funktionsfähigen neuronalen Netzes
+2. Vergleich zwischen nativer Python- und NumPy-Implementierung
+3. Systematische Hyperparameter-Optimierung
+4. Erreichen von ~97% Genauigkeit auf MNIST
 
 Das Projekt zeigt, dass selbst einfache neuronale Netze mit richtiger Konfiguration beeindruckende Ergebnisse erzielen können. Die NumPy-Implementierung ist klar die bessere Wahl für praktische Anwendungen, während die native Python-Version wertvoll für das Verständnis der zugrundeliegenden Algorithmen bleibt.
 
