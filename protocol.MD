@@ -11,7 +11,7 @@
 
 ## <a name="projektuebersicht"></a>Projektübersicht
 
-Das NanoNeuron-Projekt implementiert ein einfaches neuronales Netzwerk zur Erkennung handgeschriebener Ziffern (0-9) aus dem MNIST-Dataset. Das Projekt demonstriert sowohl eine native Python-Implementierung als auch eine optimierte NumPy-Variante.
+Das NanoNeuron-Projekt implementiert ein einfaches neuronales Netzwerk zur Erkennung handgeschriebener Ziffern (0-9) aus dem MNIST-Dataset.
 
 ### Netzwerkarchitektur
 
@@ -54,10 +54,6 @@ def sigmoid(self, x):
 - Transformiert beliebige Eingabewerte in den Bereich [0, 1]
 - Differenzierbar (wichtig für Backpropagation)
 - Ableitung: `sigmoid(x) * (1 - sigmoid(x))`
-
-**Visualisierung**:
-
-![Sigmoid-Aktivierungsfunktion](images/sigmoid_function.png)
 
 ### 3. Forward Propagation (`forward`)
 
@@ -112,8 +108,6 @@ def train(self, x, label):
     self.W1 -= self.learning_rate * np.outer(error_hidden, x)
     self.b1 -= self.learning_rate * error_hidden
 ```
-
-**Mathematischer Hintergrund**:
 
 1. **Fehler im Output Layer**:
    - Differenz zwischen Vorhersage und Ziel
@@ -210,7 +204,7 @@ self.b2 -= self.learning_rate * error_out
 | Aspekt | Ohne NumPy | Mit NumPy |
 |--------|-----------|-----------|
 | **Geschwindigkeit** | ~10-50x langsamer | Baseline (C-optimiert) |
-| **Speichereffizienz** | Weniger effizient (Python-Listen) | Sehr effizient (contiguous arrays) |
+| **Speichereffizienz** | Weniger effizient (Python-Listen) | Sehr effizient |
 | **Code-Länge** | Länger (mehr Schleifen) | Kürzer und lesbarer |
 | **Lesbarkeit** | Verschachtelte Schleifen | Mathematische Notation |
 | **Skalierbarkeit** | Schlecht bei großen Netzen | Sehr gut |
@@ -218,23 +212,9 @@ self.b2 -= self.learning_rate * error_out
 ### Vorteile NumPy-Implementierung
 
 1. **Performance**: 10-50× schnellere Ausführung durch C-Backend
-2. **Parallelisierung**: Automatische Nutzung von SIMD-Instruktionen
-3. **Speicher**: Effiziente contiguous memory arrays
-4. **Numerische Stabilität**: Bessere Implementierung mathematischer Funktionen
-5. **Lesbarkeit**: Mathematische Notation näher an theoretischen Formeln
-6. **Wartbarkeit**: Weniger Code, weniger Fehlerquellen
-
-### Wann welche Implementierung?
-
-- **Ohne NumPy**: 
-  - Lernzwecke (besseres Verständnis der Algorithmen)
-  - Sehr kleine Netze
-  - Umgebungen ohne NumPy-Support
-  
-- **Mit NumPy**:
-  - Produktive Anwendungen
-  - Größere Datensätze
-  - Wenn Performance wichtig ist
+2. **Numerische Stabilität**: Bessere Implementierung mathematischer Funktionen
+3. **Lesbarkeit**: Mathematische Notation näher an theoretischen Formeln
+4. **Wartbarkeit**: Weniger Code, weniger Fehlerquellen
 
 ---
 
@@ -409,26 +389,19 @@ Die native Python-Implementierung ist wertvoll für:
 Das einfache 3-Layer-Netzwerk erreicht:
 - **~97% Genauigkeit** auf MNIST
 - **3 Epochen** Training ausreichend
-- **Keine Regularisierung** benötigt
 
-Dies ist bemerkenswert für ein so einfaches Netzwerk!
 
 ### Verbesserungspotenzial
 
 1. **Architektur**:
    - Mehrere Hidden Layers (Deep Learning)
-   - ReLU statt Sigmoid (schnellere Konvergenz)
+   - ReLU statt Sigmoid
    - Dropout für bessere Generalisierung
 
 2. **Training**:
    - Learning Rate Scheduling (dynamische Anpassung)
-   - Mini-Batch Gradient Descent
    - Data Augmentation (Rotation, Verzerrung)
 
-3. **Optimierung**:
-   - Adam statt einfachem Gradient Descent
-   - Batch Normalization
-   - Cross-Entropy Loss statt MSE
 
 ### Praktische Empfehlungen
 
@@ -451,17 +424,12 @@ TRAIN_SAMPLES = 59999       # Maximale Daten nutzen
 
 ### Zusammenfassung
 
-Das NanoNeuron-Projekt demonstriert erfolgreich:
+Das NanoNeuronNeuronalNetwork zeigt:
 
 1. Implementierung eines funktionsfähigen neuronalen Netzes
 2. Vergleich zwischen nativer Python- und NumPy-Implementierung
 3. Systematische Hyperparameter-Optimierung
 4. Erreichen von ~97% Genauigkeit auf MNIST
 
-Das Projekt zeigt, dass selbst einfache neuronale Netze mit richtiger Konfiguration beeindruckende Ergebnisse erzielen können. Die NumPy-Implementierung ist klar die bessere Wahl für praktische Anwendungen, während die native Python-Version wertvoll für das Verständnis der zugrundeliegenden Algorithmen bleibt.
+Das Projekt zeigt, dass selbst einfache neuronale Netze mit richtiger Konfiguration gute Ergebnisse erzielen können. Die NumPy-Implementierung ist klar die bessere Wahl für praktische Anwendungen, während die native Python-Version wertvoll für das Verständnis der zugrundeliegenden Algorithmen bleibt.
 
----
-
-*Protokoll erstellt am: 04.01.2026*
-*Analysierte Modelle: 69*
-*Framework: NumPy + Native Python*
