@@ -259,22 +259,27 @@ def predict(self, x):
 In der Implementierung ohne NumPy gibt es einen Fehler in den Zeilen 95-98:
 
 ```python
-# FEHLER: Sollte hidden_size statt output_size verwenden
-for i in range(self.output_size):  # ← FALSCH
-    for j in range(self.hidden_size):
+# FEHLER: Falsche Schleifenbereiche und Indizierung
+for i in range(self.output_size):  # ← FALSCH (sollte hidden_size sein)
+    for j in range(self.hidden_size):  # ← FALSCH (sollte input_size sein)
         self.W1[i][j] -= self.learning_rate * error_hidden[i] * x[j]
     self.b1[i] -= self.learning_rate * error_hidden[i]
 ```
+
+**Problem**: 
+- W1 hat die Dimensionen (hidden_size, input_size)
+- Der Code iteriert aber über (output_size, hidden_size)
+- Dies führt zu falschen Array-Zugriffen und falschem Training
 
 **Korrektur**:
 ```python
 for i in range(self.hidden_size):  # ← RICHTIG
-    for j in range(self.input_size):
+    for j in range(self.input_size):  # ← RICHTIG
         self.W1[i][j] -= self.learning_rate * error_hidden[i] * x[j]
     self.b1[i] -= self.learning_rate * error_hidden[i]
 ```
 
-Die NumPy-Version hat diesen Fehler nicht, da sie die richtigen Dimensionen durch `np.outer()` automatisch verwaltet.
+Die NumPy-Version hat diesen Fehler nicht, da sie mit `np.outer(error_hidden, x)` die richtigen Dimensionen automatisch verwaltet und eine Matrix der Größe (hidden_size, input_size) erzeugt.
 
 ## Training und Hyperparameter
 
