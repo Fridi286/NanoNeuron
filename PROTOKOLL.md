@@ -369,9 +369,9 @@ Die Grafik zeigt:
 
 #### Wichtige Erkenntnisse aus den Experimenten
 
-1. **Trainingsdatenmenge ist entscheidend**: 
+1. **Trainingsdatenmenge ist entscheidend**:
    - Mit 5.000 Samples: ~91% maximale Genauigkeit
-   - Mit 50.000 Samples: ~96.6% maximale Genauigkeit  
+   - Mit 50.000 Samples: ~96.6% maximale Genauigkeit
    - Mit 59.999 Samples: ~97.1% maximale Genauigkeit
    - **Fazit**: Mehr Trainingsdaten führen zu signifikant besseren Ergebnissen
 
