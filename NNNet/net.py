@@ -58,12 +58,16 @@ class NNNet():
         return h, o
 
     # Backpropagation
-    def train(self, x, label):
+    def train(self, x, label, letter = False):
         h, o = self.forward(x)
 
         # creating ideal goal vector, the right bit is on 1
         y = np.zeros(self.output_size)
-        y[label] = 1
+        if letter:
+            y[label - 1] = 1  # Label von 1-26 auf 0-25 mappen
+        else:
+            y[label] = 1
+
 
         #calculate error in the output layer
         error_out = (o - y) * o * (1 - o)
