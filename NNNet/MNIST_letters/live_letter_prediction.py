@@ -15,7 +15,7 @@ from NNNet.net import NNNet
 
 def load_model():
     nn = NNNet(input_size=784, hidden_size=100, output_size=26, seed=42, learning_rate=0.1)
-    nn.load_NNNet("C:\\Users\\fridi\\PycharmProjects\\NanoNeuron\\NNNet_saves_ExtendedMNIST\\Letters\\LetterNet_hs300_os26_seed42_lr0.2.npz")
+    nn.load_NNNet("C:\\Users\\fridi\\PycharmProjects\\NanoNeuron\\NNNet\\MNIST_letters\\training_saves\\LetterNet_hs300_os26_seed42_lr0.2.npz")
     return nn
 
 nnnet = load_model()

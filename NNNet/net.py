@@ -1,8 +1,13 @@
 import random
 import math
+from typing import List
 
 import numpy as np
+from pydantic import BaseModel
 
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent
 
 class NNNet():
 
@@ -10,28 +15,44 @@ class NNNet():
     def __init__(
             self,
             input_size,
-            hidden_size,
+            hidden_layers: List[int],
             output_size,
             seed=None,
             learning_rate = 0.01,
             pre_trained = None,
     ):
 
+        self.z = None
+        self.a = None
         self.seed = seed
         if seed is not None:
             np.random.seed(seed)
             random.seed(seed)
         self.input_size = input_size
-        self.hidden_size = hidden_size
+        self.hidden_layers = hidden_layers
         self.output_size = output_size
 
-        # random weighted inputs for hidden layer
-        self.W1 = np.random.uniform(-0.1, 0.1, (hidden_size, input_size))
-        self.b1 = np.zeros(hidden_size)
+        self.W = []
+        self.b = []
+        prev_size = input_size
 
-        # random weighted inputs for output layer
-        self.W2 = np.random.uniform(-0.1, 0.1, (output_size, hidden_size))
-        self.b2 = np.zeros(output_size)
+        #Random weights for each hidden layer
+        for hidden_size in hidden_layers:
+            self.W.append(
+                np.random.uniform(-0.1, 0.1, (hidden_size, prev_size))
+            )
+            self.b.append(
+                np.zeros(hidden_size)
+            )
+            prev_size = hidden_size
+
+        # Output-Layer hinzufügen
+        self.W.append(
+            np.random.uniform(-0.1, 0.1, (output_size, prev_size))
+        )
+        self.b.append(
+            np.zeros(output_size)
+        )
 
         if pre_trained:
             self.load_NNNet(pre_trained)
@@ -47,60 +68,85 @@ class NNNet():
 
     # forward propagation
     def forward(self, x):
-        # Calculates activations for each neuron in the first hidden layer
-        h_raw = self.W1 @ x + self.b1
-        h = self.sigmoid(h_raw)
+        self.a = [x]  # Activations, a[0] = input
+        self.z = []  # Pre-activations
 
-        # Calculates activations for each neuron in the output layer
-        o_raw = self.W2 @ h + self.b2
-        o = self.sigmoid(o_raw)
+        for l in range(len(self.W)):  # W enthält ALLE Layer, inkl. Output
+            z = self.W[l] @ self.a[l] + self.b[l]
+            self.z.append(z)
+            a = self.sigmoid(z)
+            self.a.append(a)
 
-        return h, o
+        return self.a[-1]  # Output
 
     # Backpropagation
-    def train(self, x, label, letter = False):
-        h, o = self.forward(x)
+    def train(self, x, label, letter=False):
+        o = self.forward(x)
 
-        # creating ideal goal vector, the right bit is on 1
         y = np.zeros(self.output_size)
-        if letter:
-            y[label - 1] = 1  # Label von 1-26 auf 0-25 mappen
-        else:
-            y[label] = 1
+        y[label - 1 if letter else label] = 1
 
+        # delta im Output-Layer
+        delta = (o - y) * o * (1 - o)
 
-        #calculate error in the output layer
-        error_out = (o - y) * o * (1 - o)
+        # Rückwärts durch alle Layer
+        for l in range(len(self.W) - 1, -1, -1):
+            a_prev = self.a[l]
 
-        #calculating the impact each hidden layer neuron has to the given output
-        error_hidden = (self.W2.T @ error_out) * h * (1 - h)    # using derivation of sigmoid
+            # delta fürs vorherige Layer VOR dem Update berechnen
+            if l > 0:
+                a_prev_act = self.a[l]
+                delta_prev = (self.W[l].T @ delta) * (a_prev_act * (1 - a_prev_act))
 
-        # now we need to update both weights W1 and W2 using gradient descent
+            dW = np.outer(delta, a_prev)
+            db = delta
 
-        #   updating W2
-        self.W2 -= self.learning_rate * np.outer(error_out, h)
-        self.b2 -= self.learning_rate * error_out
+            self.W[l] -= self.learning_rate * dW
+            self.b[l] -= self.learning_rate * db
 
-        #   updating W1
-        self.W1 -= self.learning_rate * np.outer(error_hidden, x)
-        self.b1 -= self.learning_rate * error_hidden
+            if l > 0:
+                delta = delta_prev
+
+        return o
 
     def predict(self, x):
-        _, o = self.forward(x)
+        o = self.forward(x)
         # Theoretically the right number should have the highest actication
         return np.argmax(o)
 
     def predict_debug(self, x):
-        _, o = self.forward(x)
+        o = self.forward(x)
         # Theoretically the right number should have the highest actication
         return np.argmax(o), o
 
-    def save_NNNet(self, path):
-        np.savez(path, W1=self.W1, W2=self.W2, b1=self.b1, b2=self.b2)
+    def save_NNNet(self, path: str):
+        hidden_layers_String = f"HL"
+        for i in self.hidden_layers:
+            hidden_layers_String += f"-{i}"
+        # Speichert W und b als Listen in einer .npz
+        np.savez(
+            path+f"IS{self.input_size}_LR{self.learning_rate}_SEED{self.seed}_HL{hidden_layers_String}.npz",
+            W=np.array(self.W, dtype=object),
+            b=np.array(self.b, dtype=object),
+            input_size=self.input_size,
+            hidden_layers=np.array(self.hidden_layers, dtype=int),
+            output_size=self.output_size,
+            learning_rate=self.learning_rate,
+            seed=-1 if self.seed is None else int(self.seed),
+        )
 
-    def load_NNNet(self, path):
-        data = np.load(path)
-        self.W1 = data["W1"]
-        self.W2 = data["W2"]
-        self.b1 = data["b1"]
-        self.b2 = data["b2"]
+    def load_NNNet(self, path: str):
+        data = np.load(path, allow_pickle=True)
+
+        self.W = list(data["W"])
+        self.b = list(data["b"])
+
+        # optional: Meta wiederherstellen (falls du willst)
+        self.input_size = int(data["input_size"])
+        self.hidden_layers = list(data["hidden_layers"].astype(int))
+        self.output_size = int(data["output_size"])
+        self.learning_rate = float(data["learning_rate"])
+
+        seed = int(data["seed"])
+        self.seed = None if seed == -1 else seed
+
