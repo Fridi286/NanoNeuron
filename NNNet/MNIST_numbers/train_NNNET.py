@@ -13,6 +13,7 @@ def train_NNNet(
         seed=None,
         learning_rate=0.01,
         pre_trained=None,
+        relu=None,
 ):
 
     train_image_path = BASE_DIR / "MNIST_numbers" / "data" / "train-images.idx3-ubyte"
@@ -97,9 +98,10 @@ def train_NNNet(
 if __name__ == "__main__":
     train_NNNet(
         input_size=784,
-        hidden_layers=[400, 200, 100],
+        hidden_layers=[400, 350, 100],
         output_size=10,
         seed=42,
         learning_rate=0.2,
         pre_trained=None,
+        relu=True,
     )

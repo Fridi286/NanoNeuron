@@ -20,6 +20,7 @@ class NNNet():
             seed=None,
             learning_rate = 0.01,
             pre_trained = None,
+            relu=False,
     ):
 
         self.z = None
@@ -31,6 +32,7 @@ class NNNet():
         self.input_size = input_size
         self.hidden_layers = hidden_layers
         self.output_size = output_size
+        self.relu= relu
 
         self.W = []
         self.b = []
@@ -68,6 +70,7 @@ class NNNet():
 
     # forward propagation
     def forward(self, x):
+        if self.relu: return self.forward(self, x)
         self.a = [x]  # Activations, a[0] = input
         self.z = []  # Pre-activations
 
@@ -81,6 +84,7 @@ class NNNet():
 
     # Backpropagation
     def train(self, x, label, letter=False):
+        if self.relu: return self.train_relu(self, x, label, letter=False)
         o = self.forward(x)
 
         y = np.zeros(self.output_size)
@@ -88,6 +92,64 @@ class NNNet():
 
         # delta im Output-Layer
         delta = (o - y) * o * (1 - o)
+
+        # Rückwärts durch alle Layer
+        for l in range(len(self.W) - 1, -1, -1):
+            a_prev = self.a[l]
+
+            # delta fürs vorherige Layer VOR dem Update berechnen
+            if l > 0:
+                a_prev_act = self.a[l]
+                delta_prev = (self.W[l].T @ delta) * (a_prev_act * (1 - a_prev_act))
+
+            dW = np.outer(delta, a_prev)
+            db = delta
+
+            self.W[l] -= self.learning_rate * dW
+            self.b[l] -= self.learning_rate * db
+
+            if l > 0:
+                delta = delta_prev
+
+        return o
+
+    def softmax(self, z):
+        z = z - np.max(z)  # wichtig für Stabilität
+        exp_z = np.exp(z)
+        return exp_z / np.sum(exp_z)
+
+    # translates big values into values between 0 and infinity
+    def relu_deriv(x):
+        return (x > 0).astype(float)
+
+    # forward propagation
+    def forward_relu(self, x):
+        if self.relu: return self.forward(self, x)
+        self.a = [x]  # Activations, a[0] = input
+        self.z = []  # Pre-activations
+
+        for l in range(len(self.W)):
+            z = self.W[l] @ self.a[l] + self.b[l]
+            self.z.append(z)
+
+            if l == len(self.W) - 1:
+                a = self.softmax(z)  # Output-Layer
+            else:
+                a = self.relu_deriv(z)  # Hidden-Layer
+
+            self.a.append(a)
+
+        return self.a[-1]  # Output
+
+    # Backpropagation with relu and softmax
+    def train_relu(self, x, label, letter=False):
+        o = self.forward(x)
+
+        y = np.zeros(self.output_size)
+        y[label - 1 if letter else label] = 1
+
+        # delta im Output-Layer
+        delta = o - y
 
         # Rückwärts durch alle Layer
         for l in range(len(self.W) - 1, -1, -1):
@@ -125,7 +187,7 @@ class NNNet():
             hidden_layers_String += f"-{i}"
         # Speichert W und b als Listen in einer .npz
         np.savez(
-            path+f"IS{self.input_size}_LR{self.learning_rate}_SEED{self.seed}_HL{hidden_layers_String}.npz",
+            path+f"IS{self.input_size}_LR{self.learning_rate}_SEED{self.seed}_{hidden_layers_String}.npz",
             W=np.array(self.W, dtype=object),
             b=np.array(self.b, dtype=object),
             input_size=self.input_size,
