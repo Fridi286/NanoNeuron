@@ -296,7 +296,7 @@ class NNNet():
         b_cpu = [cp.asnumpy(b) if self.use_gpu else b for b in self.b]
 
         np.savez(
-            path + f"RELU{self.use_relu}_GPU{self.use_gpu}_IS{self.input_size}_LR{self.learning_rate}_SEED{self.seed}_{hidden_layers_String}.npz",
+            path,
             W=np.array(W_cpu, dtype=object),
             b=np.array(b_cpu, dtype=object),
             input_size=self.input_size,

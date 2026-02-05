@@ -15,10 +15,11 @@ def train_NNNet(
         learning_rate=0.01,
         pre_trained=None,
         relu=None,
-
         use_batches=False,
         batch_size=32,
         use_gpu=False,
+
+        EPOCHS=3,
 ):
     if not use_batches: batch_size = 1
 
@@ -56,15 +57,12 @@ def train_NNNet(
         use_gpu=use_gpu,
     )
 
+    print("initializing training loop")
     # GPU-Daten-Konvertierung
     if use_gpu:
         import cupy as cp
         train_images = cp.asarray(train_images)
         test_images = cp.asarray(test_images)
-
-    print("initializing training loop")
-    EPOCHS = 10
-    TRAIN_SAMPLES = len(train_images)
 
     print("Start Training...")
 
@@ -109,14 +107,27 @@ def train_NNNet(
     print(f"Final Test Accuracy: {accuracy}")
 
     print("Saving Model...")
-    counter = 1
-    path = str(BASE_DIR / "MNIST_numbers" / "training_saves" / f"nnnet_number{counter}_EP{EPOCHS}_ACC{accuracy}_BATCH{batch_size}")
+    counter = 0
+    model_details = (f""
+                     f"_EP-{EPOCHS}"
+                     f"_ACC-{accuracy}"
+                     f"_BS-{batch_size}"
+                     f"_R-{relu}"
+                     f"_G-{use_gpu}"
+                     f"_IS-{input_size}"
+                     f"_LR-{learning_rate}"
+                     f"_S-{nnnet.seed}"
+                     f"_HL-{hidden_layers}"
+                     )
+    file_name = f"nnnet" + model_details + ".npz"
+    path = str(BASE_DIR / "MNIST_numbers" / "training_saves" / file_name)
 
     exists = True
     while exists:
         if os.path.exists(path):
             counter += 1
-            path = str(BASE_DIR / "MNIST_numbers" / "training_saves" / f"nnnet_number_{counter}_EP{EPOCHS}_ACC{accuracy}_BATCH{batch_size}")
+            file_name = f"nnnet" + model_details + f"({counter})" + ".npz"
+            path = str(BASE_DIR / "MNIST_numbers" / "training_saves" / file_name)
         else:
             exists = False
     nnnet.save_NNNet(path)
@@ -125,13 +136,15 @@ def train_NNNet(
 if __name__ == "__main__":
     train_NNNet(
         input_size=784,
-        hidden_layers=[1000, 1000, 500],
+        hidden_layers=[20],
         output_size=10,
-        seed=2100120808,
+        seed=42,
         learning_rate=0.01,
         pre_trained=None,
-        relu=True,
+        relu=False,
         use_batches=True,
         batch_size=64,
-        use_gpu=True,
+        use_gpu=False,
+
+        EPOCHS=3,
     )
