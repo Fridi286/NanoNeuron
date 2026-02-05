@@ -32,7 +32,13 @@ def train_NNNet(
 
     print(len(train_images))
 
-    print("Create neuronal network NNNet")
+    print(f"Create neuronal network NNNet with configuration:\n"
+          f"Input Size: {input_size}\n"
+          f"Hidden Layers: {str(hidden_layers)}\n"
+          f"Output Size: {output_size}\n"
+          f"Seed: {seed}\n"
+          f"Learning Rate: {learning_rate}\n"
+          f"Pre-Trained?: {pre_trained}\n")
     nnnet = NNNet(
         input_size=input_size,
         hidden_layers=hidden_layers,
@@ -43,7 +49,7 @@ def train_NNNet(
     )
 
     print("initializing training loop")
-    EPOCHS = 3
+    EPOCHS = 5
     TRAIN_SAMPLES = len(train_images)
 
     print("Start Training...")
@@ -98,10 +104,10 @@ def train_NNNet(
 if __name__ == "__main__":
     train_NNNet(
         input_size=784,
-        hidden_layers=[400, 350, 100],
+        hidden_layers=[512, 256, 128],
         output_size=10,
-        seed=42,
-        learning_rate=0.2,
+        seed=None,
+        learning_rate=0.15,
         pre_trained=None,
         relu=True,
     )

@@ -61,16 +61,17 @@ class NNNet():
 
         self.learning_rate = learning_rate
 
-    def rand(self):
-        return random.uniform(-0.1, 0.1)
+    # =======================FORWARDING + BACKPROPAGATION==========================
 
-    # translates big values into values between 0 and 1
+    # -----------------------------------------------------------------------------
+    # FORWARDING AND BACKPORPAGATON WITH SIGMOID
+    # -----------------------------------------------------------------------------
     def sigmoid(self, x):
         return 1 / (1 + np.exp(-x))
 
     # forward propagation
     def forward(self, x):
-        if self.relu: return self.forward(self, x)
+        if self.relu: return self.forward_relu(self, x)
         self.a = [x]  # Activations, a[0] = input
         self.z = []  # Pre-activations
 
@@ -113,6 +114,9 @@ class NNNet():
 
         return o
 
+    # -----------------------------------------------------------------------------------
+    # FORWARDING AND BACKPORPAGATON WITH RELU AND SOFTMAX
+    # -----------------------------------------------------------------------------------
     def softmax(self, z):
         z = z - np.max(z)  # wichtig für Stabilität
         exp_z = np.exp(z)
@@ -124,7 +128,6 @@ class NNNet():
 
     # forward propagation
     def forward_relu(self, x):
-        if self.relu: return self.forward(self, x)
         self.a = [x]  # Activations, a[0] = input
         self.z = []  # Pre-activations
 
@@ -171,6 +174,10 @@ class NNNet():
 
         return o
 
+    # ===========================================================================
+    # Predict
+    # ===========================================================================
+
     def predict(self, x):
         o = self.forward(x)
         # Theoretically the right number should have the highest actication
@@ -180,6 +187,10 @@ class NNNet():
         o = self.forward(x)
         # Theoretically the right number should have the highest actication
         return np.argmax(o), o
+
+    # ===========================================================================
+    # SAVE + LOAD
+    # ===========================================================================
 
     def save_NNNet(self, path: str):
         hidden_layers_String = f"HL"

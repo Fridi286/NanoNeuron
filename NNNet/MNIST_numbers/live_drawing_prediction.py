@@ -11,11 +11,12 @@ from matplotlib.figure import Figure
 # ------------------------------------------
 # Dein Modell laden
 # ------------------------------------------
-from NNNet.net import NNNet
+from NNNet.net import NNNet, BASE_DIR
+
 
 def load_model():
-    nn = NNNet(input_size=784, hidden_size=120, seed=52, learning_rate=0.25, output_size=10)
-    nn.load_NNNet("number_net_saves/59999samples/nnnet_save1_acc0.9710_hs120_lr0.25_seed1000.npz")
+    nn = NNNet(input_size=784, hidden_layers=[256, 128], seed=52, learning_rate=0.25, output_size=10)
+    nn.load_NNNet(str(BASE_DIR / "MNIST_numbers" / "training_saves" / "nnnet_number1_ACC0.9754_IS784_LR0.2_SEED42_HL-256-128.npz"))
     return nn
 
 nnnet = load_model()
