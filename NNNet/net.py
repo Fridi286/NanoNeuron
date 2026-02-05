@@ -1,9 +1,7 @@
 import random
-import math
 from typing import List
 
 import numpy as np
-from pydantic import BaseModel
 
 from pathlib import Path
 
@@ -25,14 +23,16 @@ class NNNet():
 
         self.z = None
         self.a = None
+        if seed is None:
+            seed = random.randint(0, 2 ** 32 - 1)
+
         self.seed = seed
-        if seed is not None:
-            np.random.seed(seed)
-            random.seed(seed)
+        np.random.seed(seed)
+        random.seed(seed)
         self.input_size = input_size
         self.hidden_layers = hidden_layers
         self.output_size = output_size
-        self.relu= relu
+        self.use_relu= relu
 
         self.W = []
         self.b = []
@@ -71,7 +71,7 @@ class NNNet():
 
     # forward propagation
     def forward(self, x):
-        if self.relu: return self.forward_relu(self, x)
+        if self.use_relu: return self.forward_relu(x)
         self.a = [x]  # Activations, a[0] = input
         self.z = []  # Pre-activations
 
@@ -85,7 +85,7 @@ class NNNet():
 
     # Backpropagation
     def train(self, x, label, letter=False):
-        if self.relu: return self.train_relu(self, x, label, letter=False)
+        if self.use_relu: return self.train_relu(x, label, letter=False)
         o = self.forward(x)
 
         y = np.zeros(self.output_size)
@@ -123,8 +123,11 @@ class NNNet():
         return exp_z / np.sum(exp_z)
 
     # translates big values into values between 0 and infinity
-    def relu_deriv(x):
+    def relu_deriv(self, x):
         return (x > 0).astype(float)
+
+    def relu(self, x):
+        return np.maximum(0, x)
 
     # forward propagation
     def forward_relu(self, x):
@@ -138,15 +141,15 @@ class NNNet():
             if l == len(self.W) - 1:
                 a = self.softmax(z)  # Output-Layer
             else:
-                a = self.relu_deriv(z)  # Hidden-Layer
+                a = self.relu(z)  # Hidden-Layer
 
             self.a.append(a)
 
         return self.a[-1]  # Output
 
     # Backpropagation with relu and softmax
-    def train_relu(self, x, label, letter=False):
-        o = self.forward(x)
+    def train_relu(self, x, label, letter):
+        o = self.forward_relu(x)
 
         y = np.zeros(self.output_size)
         y[label - 1 if letter else label] = 1
@@ -161,7 +164,8 @@ class NNNet():
             # delta fürs vorherige Layer VOR dem Update berechnen
             if l > 0:
                 a_prev_act = self.a[l]
-                delta_prev = (self.W[l].T @ delta) * (a_prev_act * (1 - a_prev_act))
+                relu_grad = (self.z[l - 1] > 0).astype(float)
+                delta_prev = (self.W[l].T @ delta) * relu_grad
 
             dW = np.outer(delta, a_prev)
             db = delta
@@ -198,7 +202,7 @@ class NNNet():
             hidden_layers_String += f"-{i}"
         # Speichert W und b als Listen in einer .npz
         np.savez(
-            path+f"IS{self.input_size}_LR{self.learning_rate}_SEED{self.seed}_{hidden_layers_String}.npz",
+            path+f"RELU{self.use_relu}_IS{self.input_size}_LR{self.learning_rate}_SEED{self.seed}_{hidden_layers_String}.npz",
             W=np.array(self.W, dtype=object),
             b=np.array(self.b, dtype=object),
             input_size=self.input_size,

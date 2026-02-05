@@ -46,6 +46,7 @@ def train_NNNet(
         seed=seed,
         learning_rate=learning_rate,
         pre_trained=pre_trained,
+        relu=relu,
     )
 
     print("initializing training loop")
@@ -96,7 +97,7 @@ def train_NNNet(
     while exists:
         if os.path.exists(path):
             counter += 1
-            path = str(BASE_DIR / "MNIST_numbers" / "training_saves" / f"nnnet_number_{counter}_ACC{accuracy}_")
+            path = str(BASE_DIR / "MNIST_numbers" / "training_saves" / f"nnnet_number_{counter}_EP{EPOCHS}_ACC{accuracy}_")
         else:
             exists = False
     nnnet.save_NNNet(path)
@@ -104,10 +105,10 @@ def train_NNNet(
 if __name__ == "__main__":
     train_NNNet(
         input_size=784,
-        hidden_layers=[512, 256, 128],
+        hidden_layers=[128],
         output_size=10,
         seed=None,
-        learning_rate=0.15,
+        learning_rate=0.01,
         pre_trained=None,
         relu=True,
     )
