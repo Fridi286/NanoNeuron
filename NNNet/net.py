@@ -1,6 +1,18 @@
 import random
 from typing import List
 
+import random
+from typing import List
+from pathlib import Path
+
+try:
+    import cupy as cp
+    GPU_AVAILABLE = True
+    print("GPU (CuPy) verfügbar")
+except ImportError:
+    GPU_AVAILABLE = False
+    print("GPU nicht verfügbar, nutze CPU (NumPy)")
+
 import numpy as np
 
 from pathlib import Path
@@ -19,7 +31,11 @@ class NNNet():
             learning_rate = 0.01,
             pre_trained = None,
             relu=False,
+            use_gpu=False,
     ):
+
+        self.use_gpu = use_gpu and GPU_AVAILABLE
+        self.xp = cp if self.use_gpu else np  # NumPy oder CuPy wählen
 
         self.z = None
         self.a = None
@@ -28,11 +44,15 @@ class NNNet():
 
         self.seed = seed
         np.random.seed(seed)
+        if self.use_gpu:
+            cp.random.seed(seed)
         random.seed(seed)
+
         self.input_size = input_size
         self.hidden_layers = hidden_layers
         self.output_size = output_size
         self.use_relu= relu
+        self.use_gpu = use_gpu
 
         self.W = []
         self.b = []
@@ -40,21 +60,14 @@ class NNNet():
 
         #Random weights for each hidden layer
         for hidden_size in hidden_layers:
-            self.W.append(
-                np.random.uniform(-0.1, 0.1, (hidden_size, prev_size))
-            )
-            self.b.append(
-                np.zeros(hidden_size)
-            )
+            self.W.append(self.xp.random.uniform(-0.1, 0.1, (hidden_size, prev_size)))
+            self.b.append(self.xp.zeros(hidden_size))
             prev_size = hidden_size
 
         # Output-Layer hinzufügen
-        self.W.append(
-            np.random.uniform(-0.1, 0.1, (output_size, prev_size))
-        )
-        self.b.append(
-            np.zeros(output_size)
-        )
+        W = np.random.uniform(-0.1, 0.1, (output_size, prev_size))
+        self.W.append(self.xp.asarray(W) if self.use_gpu else W)
+        self.b.append(self.xp.zeros(output_size))
 
         if pre_trained:
             self.load_NNNet(pre_trained)
@@ -67,7 +80,7 @@ class NNNet():
     # FORWARDING AND BACKPORPAGATON WITH SIGMOID
     # -----------------------------------------------------------------------------
     def sigmoid(self, x):
-        return 1 / (1 + np.exp(-x))
+        return 1 / (1 + self.xp.exp(-x))
 
     # forward propagation
     def forward(self, x):
@@ -88,7 +101,7 @@ class NNNet():
         if self.use_relu: return self.train_relu(x, label, letter=False)
         o = self.forward(x)
 
-        y = np.zeros(self.output_size)
+        y = self.xp.zeros(self.output_size)
         y[label - 1 if letter else label] = 1
 
         # delta im Output-Layer
@@ -103,7 +116,7 @@ class NNNet():
                 a_prev_act = self.a[l]
                 delta_prev = (self.W[l].T @ delta) * (a_prev_act * (1 - a_prev_act))
 
-            dW = np.outer(delta, a_prev)
+            dW = self.xp.outer(delta, a_prev)
             db = delta
 
             self.W[l] -= self.learning_rate * dW
@@ -114,20 +127,16 @@ class NNNet():
 
         return o
 
-    # -----------------------------------------------------------------------------------
-    # FORWARDING AND BACKPORPAGATON WITH RELU AND SOFTMAX
-    # -----------------------------------------------------------------------------------
+    #==============================================================================
+    #      FORWARDING AND BACKPORPAGATON WITH RELU AND SOFTMAX - W/O Batch
+    #==============================================================================
     def softmax(self, z):
-        z = z - np.max(z)  # wichtig für Stabilität
-        exp_z = np.exp(z)
-        return exp_z / np.sum(exp_z)
-
-    # translates big values into values between 0 and infinity
-    def relu_deriv(self, x):
-        return (x > 0).astype(float)
+        z = z - self.xp.max(z, axis=-1, keepdims=True)
+        exp_z = self.xp.exp(z)
+        return exp_z / self.xp.sum(exp_z, axis=-1, keepdims=True)
 
     def relu(self, x):
-        return np.maximum(0, x)
+        return self.xp.maximum(0, x)
 
     # forward propagation
     def forward_relu(self, x):
@@ -151,23 +160,19 @@ class NNNet():
     def train_relu(self, x, label, letter):
         o = self.forward_relu(x)
 
-        y = np.zeros(self.output_size)
+        y = self.xp.zeros(self.output_size)  # self.xp statt np
         y[label - 1 if letter else label] = 1
 
-        # delta im Output-Layer
         delta = o - y
 
-        # Rückwärts durch alle Layer
         for l in range(len(self.W) - 1, -1, -1):
             a_prev = self.a[l]
 
-            # delta fürs vorherige Layer VOR dem Update berechnen
             if l > 0:
-                a_prev_act = self.a[l]
                 relu_grad = (self.z[l - 1] > 0).astype(float)
                 delta_prev = (self.W[l].T @ delta) * relu_grad
 
-            dW = np.outer(delta, a_prev)
+            dW = self.xp.outer(delta, a_prev)  # self.xp
             db = delta
 
             self.W[l] -= self.learning_rate * dW
@@ -177,6 +182,96 @@ class NNNet():
                 delta = delta_prev
 
         return o
+    #==============================================================================
+    #                               BATCH TRAINING
+    #==============================================================================
+    def train_relu_batch(self, x_batch, labels_batch, letter=False):
+        is_single = x_batch.ndim == 1
+        if is_single:
+            x_batch = x_batch.reshape(1, -1)
+            labels_batch = self.xp.array([labels_batch])  # self.xp
+
+        batch_size = x_batch.shape[0]
+
+        # Daten auf GPU verschieben
+        if self.use_gpu and not isinstance(x_batch, cp.ndarray):
+            x_batch = cp.asarray(x_batch)
+            labels_batch = cp.asarray(labels_batch)
+
+        self.a = [x_batch]
+        self.z = []
+
+        for l in range(len(self.W)):
+            z = (self.W[l] @ self.a[l].T).T + self.b[l]
+            self.z.append(z)
+
+            if l == len(self.W) - 1:
+                z_shifted = z - self.xp.max(z, axis=1, keepdims=True)  # self.xp
+                exp_z = self.xp.exp(z_shifted)
+                a = exp_z / self.xp.sum(exp_z, axis=1, keepdims=True)
+            else:
+                a = self.xp.maximum(0, z)  # self.xp
+
+            self.a.append(a)
+
+        o = self.a[-1]
+
+        y = self.xp.zeros((batch_size, self.output_size))  # self.xp
+        for i, label in enumerate(labels_batch):
+            label_val = int(label) if self.use_gpu else label
+            y[i, label_val - 1 if letter else label_val] = 1
+
+        delta = o - y
+
+        for l in range(len(self.W) - 1, -1, -1):
+            a_prev = self.a[l]
+
+            dW = (delta.T @ a_prev) / batch_size
+            db = self.xp.mean(delta, axis=0)  # self.xp
+
+            if l > 0:
+                relu_grad = (self.z[l - 1] > 0).astype(float)
+                delta = (delta @ self.W[l]) * relu_grad
+
+            self.W[l] -= self.learning_rate * dW
+            self.b[l] -= self.learning_rate * db
+
+        return o[0] if is_single else o
+
+    def train_epoch_batch(self, x_train, y_train, batch_size=32, letter=False):
+        # Daten auf GPU verschieben
+        if self.use_gpu:
+            if not isinstance(x_train, cp.ndarray):
+                x_train = cp.asarray(x_train)
+            if not isinstance(y_train, cp.ndarray):
+                y_train = cp.asarray(y_train)
+
+        n_samples = x_train.shape[0]
+        indices = self.xp.arange(n_samples)  # self.xp
+        self.xp.random.shuffle(indices)
+
+        total_loss = 0
+        n_batches = 0
+
+        for start_idx in range(0, n_samples, batch_size):
+            end_idx = min(start_idx + batch_size, n_samples)
+            batch_indices = indices[start_idx:end_idx]
+
+            x_batch = x_train[batch_indices]
+            y_batch = y_train[batch_indices]
+
+            output = self.train_relu_batch(x_batch, y_batch, letter)
+
+            y_one_hot = self.xp.zeros((len(y_batch), self.output_size))  # self.xp
+            for i, label in enumerate(y_batch):
+                label_val = int(label) if self.use_gpu else label
+                y_one_hot[i, label_val - 1 if letter else label_val] = 1
+
+            loss = -self.xp.sum(y_one_hot * self.xp.log(output + 1e-8)) / len(y_batch)  # self.xp
+            total_loss += float(loss) if self.use_gpu else loss
+            n_batches += 1
+
+        return total_loss / n_batches
 
     # ===========================================================================
     # Predict
@@ -184,13 +279,8 @@ class NNNet():
 
     def predict(self, x):
         o = self.forward(x)
-        # Theoretically the right number should have the highest actication
-        return np.argmax(o)
-
-    def predict_debug(self, x):
-        o = self.forward(x)
-        # Theoretically the right number should have the highest actication
-        return np.argmax(o), o
+        result = self.xp.argmax(o)  # self.xp
+        return int(result) if self.use_gpu else result
 
     # ===========================================================================
     # SAVE + LOAD
@@ -200,11 +290,15 @@ class NNNet():
         hidden_layers_String = f"HL"
         for i in self.hidden_layers:
             hidden_layers_String += f"-{i}"
-        # Speichert W und b als Listen in einer .npz
+
+        # Gewichte zurück auf CPU
+        W_cpu = [cp.asnumpy(w) if self.use_gpu else w for w in self.W]
+        b_cpu = [cp.asnumpy(b) if self.use_gpu else b for b in self.b]
+
         np.savez(
-            path+f"RELU{self.use_relu}_IS{self.input_size}_LR{self.learning_rate}_SEED{self.seed}_{hidden_layers_String}.npz",
-            W=np.array(self.W, dtype=object),
-            b=np.array(self.b, dtype=object),
+            path + f"RELU{self.use_relu}_GPU{self.use_gpu}_IS{self.input_size}_LR{self.learning_rate}_SEED{self.seed}_{hidden_layers_String}.npz",
+            W=np.array(W_cpu, dtype=object),
+            b=np.array(b_cpu, dtype=object),
             input_size=self.input_size,
             hidden_layers=np.array(self.hidden_layers, dtype=int),
             output_size=self.output_size,
@@ -215,10 +309,9 @@ class NNNet():
     def load_NNNet(self, path: str):
         data = np.load(path, allow_pickle=True)
 
-        self.W = list(data["W"])
-        self.b = list(data["b"])
+        self.W = [self.xp.asarray(w) if self.use_gpu else w for w in data["W"]]
+        self.b = [self.xp.asarray(b) if self.use_gpu else b for b in data["b"]]
 
-        # optional: Meta wiederherstellen (falls du willst)
         self.input_size = int(data["input_size"])
         self.hidden_layers = list(data["hidden_layers"].astype(int))
         self.output_size = int(data["output_size"])
