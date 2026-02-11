@@ -141,7 +141,7 @@ class NNNet():
     # forward propagation
     def forward_relu(self, x):
         self.a = [x]  # Activations, a[0] = input
-        self.z = []  # Pre-activations
+        self.z = []  # Preactivations
 
         for l in range(len(self.W)):
             z = self.W[l] @ self.a[l] + self.b[l]
@@ -281,6 +281,98 @@ class NNNet():
         o = self.forward(x)
         result = self.xp.argmax(o)  # self.xp
         return int(result) if self.use_gpu else result
+
+
+    # ===========================================================================
+    # Evaluate
+    # ===========================================================================
+
+    def evaluate(self, x_val, y_val, batch_size=256, letter=False):
+        # ggf. auf GPU schieben
+        if self.use_gpu:
+            if not isinstance(x_val, cp.ndarray):
+                x_val = cp.asarray(x_val)
+            if not isinstance(y_val, cp.ndarray):
+                y_val = cp.asarray(y_val)
+
+        n = x_val.shape[0]
+        total_loss = 0.0
+        total_correct = 0
+
+        eps = 1e-8
+
+        for start in range(0, n, batch_size):
+            end = min(start + batch_size, n)
+            xb = x_val[start:end]
+            yb = y_val[start:end]
+
+            # ---- forward (ohne Updates) ----
+            if self.use_relu:
+                # Batch-forward über deine Batch-Forward-Logik (ohne Backprop)
+                # Wir nutzen hier die gleiche Mathe wie in train_relu_batch, nur ohne Updates:
+                a = xb
+                z_list = []
+
+                for l in range(len(self.W)):
+                    z = (self.W[l] @ a.T).T + self.b[l]
+                    z_list.append(z)
+
+                    if l == len(self.W) - 1:
+                        z_shifted = z - self.xp.max(z, axis=1, keepdims=True)
+                        exp_z = self.xp.exp(z_shifted)
+                        a = exp_z / self.xp.sum(exp_z, axis=1, keepdims=True)
+                    else:
+                        a = self.xp.maximum(0, z)
+
+                o = a  # (B, C) Softmax-Wahrscheinlichkeiten
+
+                # ---- Loss: -log(p_true) gemittelt ----
+                # labels evtl. int cast bei GPU
+                if self.use_gpu:
+                    yb_idx = yb.astype(self.xp.int32)
+                else:
+                    yb_idx = yb
+
+                if letter:
+                    yb_idx = yb_idx - 1
+
+                p_true = o[self.xp.arange(o.shape[0]), yb_idx]
+                p_true = self.xp.clip(p_true, eps, 1.0)
+                batch_loss = -self.xp.mean(self.xp.log(p_true))
+
+                # ---- Accuracy ----
+                preds = self.xp.argmax(o, axis=1)
+                batch_correct = self.xp.sum(preds == yb_idx)
+
+            else:
+                # Sigmoid-Forward ist bei dir nur für EIN sample sauber implementiert.
+                # Für Val reicht: pro sample forward, dann MSE gegen One-Hot.
+                batch_loss = 0.0
+                batch_correct = 0
+                for i in range(xb.shape[0]):
+                    o = self.forward(xb[i])  # (C,)
+
+                    # One-Hot
+                    y = self.xp.zeros(self.output_size)
+                    lbl = int(yb[i]) if self.use_gpu else yb[i]
+                    y[lbl - 1 if letter else lbl] = 1
+
+                    # MSE (wie dein Sigmoid-Training stilistisch dazu passt)
+                    batch_loss += float(self.xp.mean((o - y) ** 2))
+
+                    pred = int(self.xp.argmax(o))
+                    true = int(lbl - 1 if letter else lbl)
+                    batch_correct += (pred == true)
+
+                batch_loss /= xb.shape[0]
+
+            # ---- aufsummieren----
+            total_loss += float(batch_loss) * (end - start)
+            total_correct += int(batch_correct) if self.use_gpu else int(batch_correct)
+
+        val_loss = total_loss / n
+        val_acc = total_correct / n
+        return val_loss, val_acc
 
     # ===========================================================================
     # SAVE + LOAD
