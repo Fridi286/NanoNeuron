@@ -1,4 +1,6 @@
 .idea
 .idea*
 .idea/*
+.npz
+*/.npz
 NNNet/MNIST_letters/data/**/*.csv
