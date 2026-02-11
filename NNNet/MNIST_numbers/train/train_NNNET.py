@@ -160,55 +160,56 @@ def save_cur_model(
         EPOCHS,
 ):
     print("Saving Model...")
-    counter = 0
 
-    # (optional) fürs Dateisystem runden / kürzen
-    accuracy = round(float(accuracy), 4)
+    # ---------- Werte runden (nur Anzeige / Dateisystem) ----------
+    accuracy  = round(float(accuracy), 4)
     val_loss  = round(float(val_loss), 4)
     val_acc   = round(float(val_acc), 4)
     took_time = round(float(took_time), 3)
 
-    model_details = (
+    # ---------- Ergebnis-Dateiname ----------
+    file_name = (
+        f"nnnet"
         f"_EP-{EPOCHS}"
         f"_ACC-{accuracy}"
         f"_VALLOSS-{val_loss}"
         f"_VALACC-{val_acc}"
         f"_T-{took_time}"
-    )
-    file_name = f"nnnet{model_details}.npz"
-
-    file_dir = (
-        f"_S-{nnnet.seed}"
-        f"_HL-{hidden_layers}"
-        f"_BS-{batch_size}"
-        f"_LR-{learning_rate}"
+        f".npz"
     )
 
-    # Basis-Ordner auswählen
-    if use_gpu and relu and (batch_size > 1):
-        base_dir = BASE_DIR / "MNIST_numbers" / "training_saves" / "gpu+relu+batch" / file_dir
-    elif relu and (batch_size > 1):
-        base_dir = BASE_DIR / "MNIST_numbers" / "training_saves" / "relu+batch" / file_dir
-    elif relu and (batch_size <= 1):
-        base_dir = BASE_DIR / "MNIST_numbers" / "training_saves" / "relu" / file_dir
-    elif (not use_gpu) and (not relu) and (batch_size > 1):
-        base_dir = BASE_DIR / "MNIST_numbers" / "training_saves" / "sigmoid+batch" / file_dir
-    elif (not use_gpu) and (not relu) and (batch_size <= 1):
-        base_dir = BASE_DIR / "MNIST_numbers" / "training_saves" / "sigmoid" / file_dir
-    else:
-        base_dir = BASE_DIR / "MNIST_numbers" / "training_saves" / "not_defined" / file_dir
+    # ---------- Ordnerstruktur ----------
+    base_dir = BASE_DIR / "MNIST_numbers" / "training_saves"
 
-    # rdner erstellen (nur Ordner, nicht Datei!)
+    # CPU / GPU
+    base_dir /= "gpu" if use_gpu else "cpu"
+
+    # Aktivierungsfunktion
+    base_dir /= "relu" if relu else "sigmoid"
+
+    # Batch / NoBatch
+    base_dir /= "batch" if use_batches else "nobatch"
+
+    # Batch Size (nur wenn relevant)
+    if use_batches:
+        base_dir /= f"BS-{batch_size}"
+
+    # Seed / Architektur / Learning Rate
+    base_dir /= f"S-{seed}"
+    base_dir /= f"HL-{hidden_layers}"
+    base_dir /= f"LR-{learning_rate}"
+
+    # ---------- Ordner anlegen ----------
     base_dir.mkdir(parents=True, exist_ok=True)
 
-    # finaler Dateipfad
+    # ---------- Kollisionen vermeiden ----------
     path = base_dir / file_name
-
-    # falls Datei existiert: (1), (2), ...
+    counter = 1
     while path.exists():
+        path = base_dir / f"{file_name[:-4]}({counter}).npz"
         counter += 1
-        path = base_dir / f"nnnet{model_details}({counter}).npz"
 
+    # ---------- Speichern ----------
     nnnet.save_NNNet(str(path))
 
 
@@ -223,7 +224,7 @@ if __name__ == "__main__":
         relu=True,
         use_batches=True,
         batch_size=32,
-        use_gpu=True,
+        use_gpu=False,
 
         EPOCHS=30,
     )

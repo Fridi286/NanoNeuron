@@ -1,4 +1,4 @@
-from NNNet.MNIST_numbers.train_NNNET import train_NNNet
+from NNNet.MNIST_numbers.train.train_NNNET import train_NNNet
 
 
 def train_configs():
@@ -47,7 +47,7 @@ def train_configs():
 
     seeds = [42]
 
-    EPOCHS = 50
+    EPOCHS = 40
 
     # -------------------------------
     # Grid-Search Schleife
