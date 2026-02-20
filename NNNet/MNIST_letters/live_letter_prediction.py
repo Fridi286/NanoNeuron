@@ -14,8 +14,8 @@ from matplotlib.figure import Figure
 from NNNet.net import NNNet
 
 def load_model():
-    nn = NNNet(input_size=784, hidden_size=100, output_size=26, seed=42, learning_rate=0.1)
-    nn.load_NNNet("C:\\Users\\fridi\\PycharmProjects\\NanoNeuron\\NNNet\\MNIST_letters\\training_saves\\LetterNet_hs300_os26_seed42_lr0.2.npz")
+    nn = NNNet(input_size=784, hidden_layers={10}, seed=42, learning_rate=0.1, output_size=26)
+    nn.load_NNNet("C:\\Users\\fridi\PycharmProjects\\NanoNeuron\\NNNet\MNIST_letters\\training_saves\cpu\\relu\\batch\BS-32\S-42\HL-[12]\LR-0.01\\nnnet_EP-10_ACC-0.9971.npz")
     return nn
 
 nnnet = load_model()
@@ -122,7 +122,7 @@ class LetterDrawer:
             time.sleep(UPDATE_INTERVAL)
 
             x, preview_img = self.get_mnist_image()
-            pred, o = nnnet.predict_debug(x)
+            pred, o = nnnet.predict(x)
 
             self.root.after(0, lambda: self.update_chart(o))
             self.root.after(0, lambda: self.update_preview(preview_img))

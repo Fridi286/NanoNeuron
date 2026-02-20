@@ -11,12 +11,20 @@ from matplotlib.figure import Figure
 # ------------------------------------------
 # Dein Modell laden
 # ------------------------------------------
-from NNNet.net import NNNet, BASE_DIR
+import sys
+from pathlib import Path
+
+# Füge das Hauptverzeichnis zum Python-Pfad hinzu
+project_root = Path(__file__).resolve().parent.parent.parent
+sys.path.insert(0, str(project_root))
+
+from NNNet.net import NNNet
 
 
 def load_model():
-    nn = NNNet(input_size=784, hidden_layers=[256, 128], seed=52, learning_rate=0.25, output_size=10)
-    nn.load_NNNet(str(BASE_DIR / "MNIST_numbers" / "training_saves" / "nnnet_number1_ACC0.9754_IS784_LR0.2_SEED42_HL-256-128.npz"))
+    nn = NNNet(input_size=784, hidden_layers=[64, 64], seed=42, learning_rate=0.01, output_size=10, relu=True)
+    model_path = project_root / "NNNet" / "MNIST_numbers" / "training_saves" / "cpu" / "relu" / "batch" / "BS-32" / "S-42" / "HL-[64, 64]" / "LR-0.01" / "nnnet_EP-39_ACC-0.9888_VALLOSS-0.0891_VALACC-0.9743_T-76.462.npz"
+    nn.load_NNNet(str(model_path))
     return nn
 
 nnnet = load_model()
@@ -120,7 +128,7 @@ class MNISTDrawer:
             time.sleep(UPDATE_INTERVAL)
 
             x, preview_img = self.get_mnist_image()
-            pred, o = nnnet.predict_debug(x)
+            o = nnnet.predict(x)
 
             self.root.after(0, lambda: self.update_chart(o))
             self.root.after(0, lambda: self.update_preview(preview_img))
@@ -140,7 +148,7 @@ class MNISTDrawer:
     # ----------------------------------------
     def update_preview(self, mnist_img):
         # MNIST 28×28 → sichtbar machen (z.B. 200×200)
-        img_big = mnist_img.resize((200, 200), Image.NEAREST)
+        img_big = mnist_img.resize((200, 200), Image.Resampling.NEAREST)
 
         self.preview = ImageTk.PhotoImage(img_big)
         self.preview_label.config(image=self.preview)

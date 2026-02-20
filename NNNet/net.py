@@ -19,8 +19,7 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
 
-class NNNet():
-
+class NNNet:
     # defining random weight for each loayer and ech neuron and initilaizing the neuronal network
     def __init__(
             self,
@@ -278,9 +277,21 @@ class NNNet():
     # ===========================================================================
 
     def predict(self, x):
-        o = self.forward(x)
-        result = self.xp.argmax(o)  # self.xp
-        return int(result) if self.use_gpu else result
+        # Auf GPU verschieben falls nötig
+        if self.use_gpu and not isinstance(x, cp.ndarray):
+            x = cp.asarray(x)
+
+        # Forward pass
+        if self.use_relu:
+            o = self.forward_relu(x)
+        else:
+            o = self.forward(x)
+
+        # Zurück auf CPU für Ausgabe
+        if self.use_gpu:
+            o = cp.asnumpy(o)
+
+        return o
 
 
     # ===========================================================================

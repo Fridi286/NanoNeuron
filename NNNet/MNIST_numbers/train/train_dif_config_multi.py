@@ -10,15 +10,18 @@ def make_jobs(seeds, hidden_layer_configs, learning_rates, batch_sizes, epochs):
         for hidden_layers in hidden_layer_configs:
             for lr in learning_rates:
                 # NO BATCH: Sigmoid + ReLU
+                """
                 jobs.append(dict(hidden_layers=hidden_layers, seed=seed, lr=lr,
                                 relu=False, use_batches=False, batch_size=1, use_gpu=False, epochs=epochs))
                 jobs.append(dict(hidden_layers=hidden_layers, seed=seed, lr=lr,
                                 relu=True, use_batches=False, batch_size=1, use_gpu=False, epochs=epochs))
-
+                """
                 # WITH BATCH
                 for bs in batch_sizes:
+                    """
                     jobs.append(dict(hidden_layers=hidden_layers, seed=seed, lr=lr,
                                     relu=False, use_batches=True, batch_size=bs, use_gpu=False, epochs=epochs))
+                    """
                     jobs.append(dict(hidden_layers=hidden_layers, seed=seed, lr=lr,
                                     relu=True, use_batches=True, batch_size=bs, use_gpu=False, epochs=epochs))
     return jobs
@@ -43,14 +46,13 @@ def run_one_job(job):
 
 
 def train_configs_parallel(max_workers=None):
-    learning_rates = [0.0001, 0.0003, 0.001, 0.003, 0.01, 0.05, 0.1, 0.15, 0.2]
+    learning_rates = [0.0001, 0.001, 0.01, 0.025, 0.05, 0.1]
     hidden_layer_configs = [
-        [16], [32], [64], [128], [256],
-        [32, 32], [64, 64], [128, 64], [128, 128], [256, 128],
-        [64, 64, 64], [128, 64, 32], [128, 128, 64], [256, 128, 64],
-        [64, 64, 64, 64], [128, 128, 64, 32],
+        [128], [256], [512],
+        [32, 32], [64, 64], [128, 64],
+        [256, 128, 64], [256, 128, 64, 32],
     ]
-    batch_sizes = [32, 64, 128]
+    batch_sizes = [32]
     seeds = [42]
     EPOCHS = 50
 
@@ -71,4 +73,4 @@ def train_configs_parallel(max_workers=None):
 
 
 if __name__ == "__main__":
-    train_configs_parallel(max_workers=6)  # z.B. 4
+    train_configs_parallel(max_workers=4)  # z.B. 4
