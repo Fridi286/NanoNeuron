@@ -6,7 +6,7 @@
 
 \subsection{Implementierungsdetails}
 
-Das neuronale Netz wurde in Python implementiert (\texttt{NNNet/net.py}). Als numerisches Backend wird NumPy verwendet, optional auch CuPy für GPU-Betrieb. Die Implementierung umfasst Forward-Pass, Backpropagation, Online-Training sowie Mini-Batch-Training.
+Das neuronale Netz wurde in Python implementiert. Als numerisches Backend wird NumPy verwendet, optional auch CuPy für GPU-Betrieb. Die Implementierung umfasst Forward-Pass, Backpropagation, Online-Training sowie Mini-Batch-Training.
 
 Die Gewichtsmatrizen werden zu Beginn zufällig aus einer Gleichverteilung im Intervall $[-0.1, 0.1]$ initialisiert, 
 während die Bias-Vektoren mit Null initialisiert werden. 
@@ -18,8 +18,8 @@ Die Klassenlabels werden in One-Hot-Vektoren transformiert.
 Je nach Konfiguration werden unterschiedliche Aktivierungs- und Verlustfunktionen verwendet:
 
 \begin{itemize}
-    \item Sigmoid in allen Schichten mit quadratischer Fehlerfunktion (MSE) im sampleweisen Training (\texttt{train}),
-    \item ReLU in den Hidden Layern mit Softmax im Output-Layer und Cross-Entropy-Loss (\texttt{train\_relu}, \texttt{train\_relu\_batch}).
+    \item Sigmoid in allen Schichten mit quadratischer Fehlerfunktion (MSE) im sampleweisen Training,
+    \item ReLU in den Hidden Layern mit Softmax im Output-Layer und Cross-Entropy-Loss.
 \end{itemize}
 
 \subsection{Untersuchte Netzarchitekturen}
@@ -28,7 +28,7 @@ Untersucht werden Fully Connected Netzwerke mit unterschiedlicher Tiefe und Brei
 Die Anzahl der Hidden Layer variiert zwischen ein- und mehrschichtigen Architekturen. 
 Die Anzahl der Neuronen pro Schicht wird systematisch variiert.
 
-Die im Parallelskript (\texttt{train/train\_dif\_config\_multi.py}) automatisiert getesteten Architekturen umfassen:
+Die automatisiert getesteten Architekturen umfassen:
 
 \begin{itemize}
     \item Ein Hidden Layer mit 128, 256 oder 512 Neuronen,
@@ -40,11 +40,11 @@ Der Output-Layer besitzt stets zehn Neuronen entsprechend der zehn MNIST-Klassen
 
 \subsection{Trainingsstrategie}
 
-Im Code sind zwei Trainingsstrategien implementiert:
+Es werden zwei Trainingsstrategien betrachtet:
 
 \begin{itemize}
     \item Online Learning (Batchgröße = 1),
-    \item Mini-Batch-Training (aktuell in den automatisierten Läufen mit Batchgröße 32).
+    \item Mini-Batch-Training mit Batchgröße 32.
 \end{itemize}
 
 Beim Mini-Batch-Training werden die Trainingsdaten zu Beginn jeder Epoche zufällig permutiert. 
@@ -77,8 +77,8 @@ Die Modellleistung wird anhand folgender Kennzahlen bewertet:
 
 \begin{itemize}
     \item Trainingsgenauigkeit,
-    \item Testgenauigkeit (im Code als \texttt{val\_acc} gespeichert),
-    \item Test-Loss (im Code als \texttt{val\_loss} gespeichert),
+    \item Testgenauigkeit,
+    \item Test-Loss,
     \item Generalisierungsgap (Differenz zwischen Trainings- und Testgenauigkeit),
     \item Konvergenzverlauf über die Epochen.
 \end{itemize}
@@ -87,6 +87,6 @@ Die Testdaten werden nicht zur Parameteranpassung verwendet, sondern ausschließ
 
 \subsection{Versuchsdesign}
 
-Zur systematischen Analyse der Einflussfaktoren werden mehrere Konfigurationen automatisiert trainiert. Die Trainingsläufe werden parallelisiert ausgeführt, wobei jede Konfiguration unabhängig trainiert und als \texttt{.npz}-Datei mit Metriken im Dateinamen gespeichert wird.
+Zur systematischen Analyse der Einflussfaktoren werden mehrere Konfigurationen automatisiert trainiert. Die Trainingsläufe werden parallelisiert ausgeführt, wobei jede Konfiguration unabhängig trainiert und ihre Metriken fortlaufend gespeichert werden.
 
 Alle Experimente verwenden identische Trainings- und Testdatensplits. Nicht untersuchte Hyperparameter werden konstant gehalten, um die Effekte von Trainingsstrategie und Architektur möglichst isoliert zu betrachten.

@@ -2,13 +2,13 @@
 
 \subsection{Gesamtüberblick}
 
-Die gezeigten Kennzahlen stammen aus den im Projekt gespeicherten Trainingshistorien (\texttt{training\_history.json}), die mit \texttt{train/train\_NNNET.py} erzeugt und mit \texttt{analyze\_training\_progress.py} aggregiert wurden. Dadurch sind die Aussagen in diesem Kapitel direkt auf die Implementierung zurückführbar.
+Die gezeigten Kennzahlen stammen aus den ausgewerteten Trainingsläufen und den dazugehörigen Analyseabbildungen. Dadurch sind die Aussagen in diesem Kapitel direkt anhand der visualisierten Ergebnisse nachvollziehbar.
 
 Über die untersuchten Konfigurationen hinweg zeigt sich als leistungsstärkstes Modell ein ReLU-Netz mit Mini-Batch-Training (HL-[256,128,64], LR=0.1, Batchgröße 32). Dieses Modell erreicht in den ausgewerteten Läufen eine Testgenauigkeit von 0.9847 in Epoche 17 (Abbildung~\ref{fig:best-model}).
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.8\linewidth]{image.png}
+    \includegraphics[width=0.8\linewidth]{../image.png}
     \caption{Best Model: (HL-[256,128,64], LR=0.1, Batchgröße 32)}
     \label{fig:best-model}
 \end{figure}
@@ -28,7 +28,7 @@ Validierungsgenauigkeit früher im Trainingsverlauf.
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.8\linewidth]{best_models_by_category.png}
+    \includegraphics[width=0.8\linewidth]{../best_models_by_category.png}
     \caption{Best Models by Category}
     \label{fig:best-by-category}
 \end{figure}
@@ -68,7 +68,7 @@ langsamere Verbesserungen über die Epochen hinweg.
 
 \subsection{Analyse der Trainingszeit}
 
-Zusätzlich wurde die Trainingszeit pro Epoche aus den gespeicherten Laufzeiten (Metrik \texttt{T-...} im Dateinamen) ausgewertet.
+Zusätzlich wurde die Trainingszeit pro Epoche ausgewertet (Abbildung~\ref{fig:training-time}).
 
 Mini-Batch-Training benötigt im Durchschnitt
 5.26 Sekunden pro Epoche,
@@ -91,7 +91,7 @@ des Trainingslaufs.
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.8\linewidth]{Trainingszeit.png}
+    \includegraphics[width=0.8\linewidth]{../Trainingszeit.png}
     \caption{Trainingszeit pro Epoche nach Trainingsmodus}
     \label{fig:training-time}
 \end{figure}
@@ -107,4 +107,4 @@ Die experimentellen Ergebnisse zeigen:
     \item Batch-Modelle sind schneller als Modelle ohne Batch-Verarbeitung.
 \end{itemize}
 
-Die Abbildungen~\ref{fig:best-model}, \ref{fig:best-by-category} und \ref{fig:training-time} fassen die aus dem Code reproduzierbaren Kernergebnisse zusammen.
+Die Abbildungen~\ref{fig:best-model}, \ref{fig:best-by-category} und \ref{fig:training-time} fassen die Kernergebnisse der Auswertung zusammen.
