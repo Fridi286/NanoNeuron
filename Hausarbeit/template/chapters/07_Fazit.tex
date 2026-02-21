@@ -1,0 +1,37 @@
+% !TEX root = ../termpaper.tex
+% @author Frithjof Beims
+%
+
+\section{Fazit und Ausblick}
+
+Ziel dieser Arbeit war es, den Einfluss von Aktivierungsfunktion,
+Trainingsstrategie und Netztiefe auf das Konvergenzverhalten
+und die Generalisierungsfähigkeit vollständig verbundener
+neuronaler Netze am Beispiel des MNIST-Datensatzes zu untersuchen.
+
+Die Ergebnisse zeigen, dass nicht primär die Modelltiefe,
+sondern vor allem die Optimierungsdynamik
+über die Leistungsfähigkeit entscheidet.
+Insbesondere die Kombination aus ReLU-Aktivierung
+und Mini-Batch-Training erweist sich als robust,
+stabil und effizient.
+Zusätzliche Tiefe erhöht zwar die Repräsentationskapazität,
+führt jedoch bei diesem Datensatz nur zu begrenzten Verbesserungen.
+
+Die Arbeit verdeutlicht damit,
+dass architektonische Komplexität allein
+keinen entscheidenden Vorteil bietet,
+wenn Optimierbarkeit und Trainingsstrategie
+nicht angemessen berücksichtigt werden.
+Für das betrachtete Problem
+stellt ein moderat tiefes,
+gut optimierbares Netzwerk
+eine zweckmäßige Lösung dar.
+
+Zukünftige Untersuchungen könnten den Ansatz
+auf struktursensitive Architekturen wie
+Convolutional Neural Networks übertragen,
+adaptive Optimierungsverfahren einbeziehen
+oder komplexere Datensätze analysieren,
+um die Generalisierbarkeit der beobachteten Effekte
+weiter zu prüfen.

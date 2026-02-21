@@ -1,0 +1,63 @@
+% !TEX root = ../termpaper.tex
+% @author Frithjof Beims
+%
+
+\section{Diskussion}
+
+\subsection{Interpretation der Konvergenzverläufe}
+
+Die Experimente zeigen deutliche Unterschiede im Konvergenzverhalten
+in Abhängigkeit von Aktivierungsfunktion, Trainingsstrategie und Netztiefe.
+
+ReLU-Modelle mit Mini-Batch-Training erreichen ihre maximale Validierungsgenauigkeit bereits nach etwa 15–25 Epochen, während Sigmoid-Modelle insgesamt langsamer konvergieren
+und flachere Verbesserungsverläufe aufweisen. Die frühe Stabilisierung der leistungsstarken Modelle deutet darauf hin, dass die Verlustfunktion effektiv minimiert wird und sich das Optimierungsverfahren in einem stabilen Bereich befindet.
+
+Dieses Verhalten ist konsistent mit der theoretischen Analyse des Gradientenflusses.
+Die Sigmoid-Funktion besitzt in gesättigten Bereichen sehr kleine Ableitungen, wodurch Gradienten insbesondere in tieferen Netzen abgeschwächt werden können. ReLU vermeidet dieses Problem für positive Aktivierungen und ermöglicht dadurch stabilere Parameterupdates.
+
+\subsection{Rolle der Netztiefe}
+
+Die Ergebnisse zeigen, dass zusätzliche Tiefe nur einen moderaten Leistungszuwachs bringt. Der Unterschied zwischen einem einzelnen Hidden Layer und einer dreischichtigen Architektur liegt im Bereich weniger Zehntelprozentpunkte.
+
+Dies deutet darauf hin, dass MNIST keine stark hierarchische Merkmalsrepräsentation erfordert. Fully Connected Netze mit ausreichender Breite scheinen bereits genügend Repräsentationskapazität zu besitzen, um die zugrunde liegende Struktur der Daten zu modellieren.
+
+Gleichzeitig wird deutlich, dass nicht allein die Repräsentationskapazität
+über die Leistungsfähigkeit entscheidet, sondern maßgeblich die Optimierbarkeit der Parameter. Eine größere Modellkomplexität erhöht die Schwierigkeit der Verlustminimierung, insbesondere bei ungünstigem Gradientenverhalten. Die Kombination aus Tiefe und Sigmoid führt zu langsameren Konvergenzverläufen, während ReLU die Optimierbarkeit deutlich verbessert.
+
+\subsection{Mini-Batch-Training als Stabilisierungselement}
+
+Mini-Batch-Training zeigt in den Experimenten eine klare Überlegenheit gegenüber reinem Online Learning.
+
+Die Mittelung der Gradienten über mehrere Beispiele reduziert die Varianz der Updates. Dies führt zu stabileren Lernkurven und konsistenteren Konvergenzverläufen. Neben der verbesserten Stabilität zeigt sich auch eine leicht höhere Generalisierungsleistung.
+
+Aus praktischer Perspektive ist zudem relevant, dass Mini-Batch-Training rechnerisch effizienter ist. Die vektorisierte Verarbeitung mehrerer Beispiele ermöglicht eine bessere Nutzung der zugrunde liegenden Matrixoperationen. Damit erweist sich Mini-Batch-Training sowohl aus Optimierungs- als auch aus Effizienzperspektive als die geeignetere Trainingsstrategie.
+
+\subsection{Generalisierung und Bias-Varianz-Kompromiss}
+
+Die Differenz zwischen Trainings- und Testgenauigkeit bleibt bei den leistungsstärksten Modellen gering. Ein ausgeprägtes Overfitting ist nicht zu beobachten.
+
+Die geringe Generalisierungslücke deutet darauf hin, dass sich die untersuchten Modelle in einem günstigen Bereich des Bias-Varianz-Kompromisses befinden. Die gewählte Modellkomplexität ist ausreichend, um die Trainingsdaten gut zu approximieren, ohne eine übermäßige Varianz gegenüber neuen Daten zu entwickeln.
+
+Dass zusätzliche Tiefe nur geringe Leistungsgewinne bringt, spricht ebenfalls dafür, dass die grundlegende Komplexität des Problems bereits mit moderater Modellkapazität abgedeckt werden kann.
+
+\subsection{Grenzen des Ansatzes}
+
+Trotz der konsistenten Ergebnisse besitzt der gewählte Ansatz mehrere Einschränkungen.
+
+Erstens wird ausschließlich ein Fully Connected Netzwerk verwendet. Die räumliche Struktur der Bilddaten wird nicht explizit berücksichtigt. Convolutional Neural Networks würden hier eine strukturangepasste Merkmalsextraktion ermöglichen.
+
+Zweitens werden keine expliziten Regularisierungsverfahren eingesetzt. Techniken wie Dropout oder Gewichtsnormierung könnten insbesondere bei größeren Architekturen zusätzliche Stabilität bringen.
+
+Drittens erfolgt die Optimierung mittels klassischem Gradientenabstieg ohne adaptive Verfahren. Moderne Optimierer wie Adam oder RMSprop könnten insbesondere bei tieferen Netzen eine schnellere und robustere Konvergenz ermöglichen.
+
+Schließlich ist MNIST ein vergleichsweise einfacher Benchmark. Die Übertragbarkeit der beobachteten Effekte auf komplexere Datensätze muss daher kritisch betrachtet werden.
+
+\subsection{Einordnung und Beantwortung der Leitfrage}
+
+Die zentrale Fragestellung dieser Arbeit lautete, wie sich Aktivierungsfunktion, Trainingsstrategie und Netztiefe auf Konvergenzverhalten und Generalisierung vollständig verbundener neuronaler Netze auswirken.
+
+Die empirischen Ergebnisse zeigen, dass Aktivierungsfunktion und Trainingsstrategie einen deutlich stärkeren Einfluss besitzen als die reine Netztiefe. ReLU verbessert die Optimierbarkeit tiefer Netze, während Mini-Batch-Training zu stabileren und effizienteren Lernverläufen führt. Zusätzliche Tiefe erhöht die Modellkapazität, liefert jedoch bei MNIST nur begrenzten Mehrwert.
+
+Außerdem zeigt die Analyse der Trainingszeiten, dass Mini-Batch-Training nicht nur stabilere Lernverläufe ermöglicht, sondern auch zu einer geringeren Trainingsdauer führt. Die Kombination aus ReLU und Mini-Batch erweist sich daher sowohl hinsichtlich Optimierbarkeit als auch Effizienz als die insgesamt leistungsfähigste Konfiguration.
+
+Damit bestätigt die Arbeit unter kontrollierten experimentellen Bedingungen wesentliche theoretische Annahmen über Gradientenfluss, Varianzreduktion und Repräsentationskapazität.

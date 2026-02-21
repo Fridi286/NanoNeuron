@@ -1,0 +1,55 @@
+\section{Einleitung}
+
+Diese Arbeit analysiert das Trainingsverhalten von vollständig verbundenen neuronalen Netzen anhand des MNIST-Zahlenklassifikationsproblems. Die Zielsetzung ist eine Analyse des Einflusses ausgewählter architektonischer und trainingsbezogener Faktoren auf Konvergenz und Generalisierung.
+
+Um die zugrunde liegenden Mechanismen besser nachvollziehen zu können, wird ein Vollvermaschtes Neuronales Netz selbstständig implementiert. Auf diese Weise können der Gradientenfluss, der Verlauf des Verlusts und die Stabilität der Lernkurven genau untersucht werden. Als standardisierter Referenzdatensatz ermöglicht MNIST reproduzierbare und vergleichbare Experimente.
+
+\subsection{Zielsetzung der Arbeit}
+
+Diese Arbeit hat das Ziel, den Einfluss von vier wesentlichen Faktoren auf das Konvergenz- und Generalisierungsverhalten eines neuronalen Netzes zu analysieren:
+
+\begin{itemize}
+    \item die Wahl der Aktivierungsfunktion (Sigmoid vs. ReLU),
+    \item die Trainingsstrategie (Online Learning vs. Mini-Batch Training),
+    \item die Netztiefe (ein Hidden Layer vs. drei Hidden Layer),
+    \item sowie die Wahl von geeigneten Hyperparametern (Learning Rate, Anzahl der Neuronen, Batch-Size)
+\end{itemize}
+
+Dabei soll analysiert werden, wie sich diese Faktoren auf Trainingsgenauigkeit, Testgenauigkeit, Verlustverlauf und Stabilität der Lernkurven und die Generalisierung auswirken. Ein besonderer Fokus liegt auf der Frage, inwiefern ReLU das Vanishing-Gradient-Problem mildert und ob Mini-Batch-Training zu stabileren Optimierungsverläufen führt und ein schnelleres Training ermöglicht.
+
+\subsection{Formale Problemdefinition}
+
+Formal wird das Problem als überwachtes Klassifikationsproblem definiert. Gegeben sei eine Trainingsmenge 
+\[
+\mathcal{D} = \{(x_i, y_i)\}_{i=1}^{N},
+\]
+wobei $x_i \in \mathbb{R}^{784}$ einen normierten Eingabevektor (28×28 Pixel) und $y_i \in \{0, \dots, 9\}$ die zugehörige Klassenbezeichnung (im Folgenden: Label) repräsentiert. \cite{MNISTDataset}
+
+Das Modell sei ein vollständig verbundenes neuronales Netz mit einer variablen Anzahl versteckter Schichten. Jede Schicht besteht aus einer affinen Transformation $z = W x + b$ gefolgt von einer nichtlinearen Aktivierungsfunktion.
+Der Parameterraum umfasst sämtliche Gewichtsmatrizen und Bias-Vektoren aller Schichten.
+
+Als Verlustfunktion wird die Cross-Entropy-Loss verwendet. 
+Die versteckten Schichten nutzen entweder die Sigmoid- oder die ReLU-Aktivierungsfunktion, 
+während im Ausgabelayer eine Softmax-Funktion zur Modellierung der Klassenwahrscheinlichkeiten eingesetzt wird.
+
+Das zu lösende Optimierungsproblem lautet:
+
+\[
+\min_{\theta} \; \mathcal{L}(\theta) = 
+\frac{1}{N} \sum_{i=1}^{N} 
+\ell(f_{\theta}(x_i), y_i),
+\]
+
+\cite{2014-Shai-Shalev-Shwartz-and-Shai-Ben-David}
+
+wobei $\theta$ alle Modellparameter bezeichnet und $\ell$ die Cross-Entropy-Loss-Funktion darstellt. 
+Die Optimierung erfolgt mittels Gradientenabstieg und Backpropagation.
+
+
+\subsection{Leitfrage der Untersuchung}
+
+Die zentrale Leitfrage dieser Arbeit lautet:
+
+\textit{Wie beeinflussen Aktivierungsfunktion, Trainingsstrategie und Netztiefe das Konvergenzverhalten und die Generalisierungsfähigkeit vollständig verbundener neuronaler Netze auf dem MNIST-Klassifikationsproblem?}
+
+Darüber hinaus soll untersucht werden, ob sich systematische Interaktionseffekte zwischen diesen Faktoren erkennen lassen und welche Konfiguration unter identischen Hyperparametern das stabilste und effizienteste Lernverhalten zeigt.

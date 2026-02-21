@@ -1,0 +1,85 @@
+\documentclass[
+  a4paper,            % DIN A4
+  DIV=10,             % Schriftgröße und Satzspiegel
+  oneside,            % einseitiger Druck
+  BCOR=5mm,           % Bindungskorrektur
+  parskip=half,       % Halber Abstand zwischen Absätzen
+  numbers=noenddot,   % Kein Punkt hinter Kapitelnummern
+  bibliography=totoc,  % Literaturverzeichnis im Inhaltsverzeichnis
+  listof=totoc        % Abbildungs- und Tabellenverzeichnis im Inhaltsverzeichnis
+]{scrartcl}
+\usepackage{../style/termpaperstyle}
+
+%\usepackage{layout}       % Layout Debugging
+%\usepackage{showframe}    % Layout Debugging
+\usepackage{lipsum}       % for example only
+\usepackage{blindtext}    % for example only
+
+\sisetup{locale = DE}     % siunitx locale setup
+%\DeclareSIUnit \fps{fps}  % a custom unit (usage: \SI{24}{\fps})
+
+\begin{document}
+\input{configuration/configuration}    % load all settings
+
+%\layout{}                 % Layout Debugging
+
+\hyphenation{Ba-che-lor-the-sis Mas-ter-the-sis}
+
+% Cover page here, no page number
+\ICoverPage
+
+% PDF Metadata
+\input{../style/metadata}
+
+% Titlepage is page one even if the number is not shown.
+\pagenumbering{roman}
+
+% Table of contents here
+\newpage
+\tableofcontents
+
+% Uncomment if list of source code is needed (rarely).
+%\lstlistoflistings  % requires package listings, needs to uncommenting of usepackage
+
+% path to the chapters folder is set to find the images used there
+\graphicspath{ {./chapters/} }
+
+% Chapters
+\clearpage
+\pagenumbering{arabic}
+
+\begin{abstract}
+\end{abstract}
+
+\ITextBlockKeywords
+
+\input{template/chapters/01_Einleitung}
+\input{template/chapters/03_Theoretische Grundlagen}
+\input{template/chapters/04_Methodik}
+\input{template/chapters/05_Experimente_und_Ergebnisse}
+\input{template/chapters/06_Diskussion}
+\input{template/chapters/07_Fazit}
+% Add additional chapters here
+
+%\bibliographystyle{plain}
+\nocite{*}
+\bibliographystyle{dinat}
+\bibliography{literature}
+
+\begin{abstract}
+\end{abstract}
+
+\addsec{Erklärung zum Einsatz von KI-Werkzeugen}
+
+Bei der Erstellung der Hausarbeit habe ich KI-Tools in folgendem Umfang verwendet:
+
+Für die Implementierung in Pyhton wurde hauptsächlich Copilot (Claude 4.5) verwendet. Das Tool unterstützte bei der Erstellung einer grafischen Oberfläche zur Zahlenerkennung, beim Refaktoring und Formatieren des Codes, bei der Erweiterung des Single-Prozessor Trainingsskript auf Multiprozessor-Berechnung, sowie bei der Fehlersuche.
+Außerdem unterstütze Copilot bei der Erstellung der Strukturierung eines automatisierten Auswertungsskripts über mehrere Tausend-Epochen-Trainingsdaten mit verschiedenen Netzkonfigurationen.
+
+Bei der Ausarbeitung der schriftlichen Arbeit wurde ChatGPT unterstützend eingesetzt, insbesondere zur Formatierung mathematischer Formeln im LaTeX-Format, zur sprachlichen Überarbeitung einzelner Textpassagen, zur Strukturierung der Gliederung sowie zur Unterstützung bei der Literaturrecherche. Zudem wurde ChatGPT punktuell zur Klärung fachlicher Verständnisfragen herangezogen. Die inhaltliche Bewertung und Einordnung der erhaltenen Informationen erfolgte eigenständig.
+
+Die inhaltliche Konzeption der Arbeit, die Entwicklung und Implementierung des neuronalen Netzes, die Durchführung der Experimente sowie die wissenschaftliche Interpretation der Ergebnisse erfolgten eigenständig.
+
+\Istatement
+
+\end{document}

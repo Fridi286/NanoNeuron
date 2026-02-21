@@ -1,0 +1,117 @@
+\section{Experimente und Ergebnisse}
+
+\subsection{Gesamtüberblick}
+
+Es wurden verschiedene Kombinationen aus Aktivierungsfunktion,
+Netztiefe, Lernrate und Trainingsstrategie untersucht.
+Die höchste Validierungsgenauigkeit wurde mit einem
+ReLU-Netz mit Mini-Batch-Training erreicht
+(HL-[256,128,64], LR=0.1, Batchgröße 32).
+Dieses Modell erzielte eine Validierungsgenauigkeit von 0.9847
+in Epoche 17.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\linewidth]{image.png}
+    \caption{Best Model: (HL-[256,128,64], LR=0.1, Batchgröße 32)}
+    \label{fig:placeholder}
+\end{figure}
+
+Mehrere leistungsstarke Modelle erreichen ihre maximale
+Validierungsgenauigkeit zwischen Epoche 15 und 30.
+Anschließend bleiben die Werte weitgehend stabil.
+
+\subsection{Einfluss der Aktivierungsfunktion}
+
+ReLU-Modelle erreichen in allen getesteten Konfigurationen
+höhere Validierungsgenauigkeiten als Sigmoid-Modelle.
+
+Die beste ReLU-Konfiguration erzielt 98.47\%,
+während die beste Sigmoid-Konfiguration 97.66\% erreicht.
+
+Darüber hinaus erreichen ReLU-Modelle ihre maximale
+Validierungsgenauigkeit früher im Trainingsverlauf.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\linewidth]{best_models_by_category.png}
+    \caption{Best Models by Category}
+    \label{fig:placeholder}
+\end{figure}
+
+\subsection{Einfluss der Trainingsstrategie}
+
+Der Vergleich zwischen Online Learning und Mini-Batch-Training
+zeigt Unterschiede in Genauigkeit und Stabilität.
+
+Für ReLU-Modelle steigt die maximale Validierungsgenauigkeit
+von 97.65\% (ohne Batch) auf 98.47\% (mit Batch).
+
+Batch-Modelle zeigen im Verlauf der Epochen
+gleichmäßigere Lernkurven
+als Modelle ohne Batch-Verarbeitung.
+
+\subsection{Einfluss der Netztiefe}
+
+Architekturen mit mehreren Hidden Layern
+erzielen leicht höhere Validierungsgenauigkeiten
+als Modelle mit nur einem Hidden Layer.
+
+Ein einzelner Hidden Layer mit 256 Neuronen
+erreicht 98.34\%,
+während die dreischichtige Architektur
+(256-128-64) 98.47\% erreicht.
+
+Der Unterschied zwischen den Architekturen
+liegt im Bereich weniger Zehntelprozentpunkte.
+
+\subsection{Konvergenzverhalten}
+
+Die meisten leistungsstarken Modelle
+erreichen ihre maximale Validierungsgenauigkeit
+vor Epoche 30.
+In späteren Epochen treten nur noch geringe Veränderungen auf.
+
+Sigmoid-Modelle zeigen insgesamt
+langsamere Verbesserungen über die Epochen hinweg.
+
+\subsection{Analyse der Trainingszeit}
+
+Zusätzlich wurde die Trainingszeit erfasst.
+
+Mini-Batch-Training benötigt im Durchschnitt
+5.26 Sekunden pro Epoche,
+während Online Learning im Mittel
+8.06 Sekunden pro Epoche benötigt.
+
+ReLU-Modelle benötigen durchschnittlich
+5.72 Sekunden pro Epoche,
+Sigmoid-Modelle 7.82 Sekunden.
+
+Kleinere Netze mit 16 Neuronen im Hidden Layer
+erreichen Gesamttrainingszeiten von etwa 60 Sekunden
+für 50 Epochen,
+erzielen jedoch geringere Validierungsgenauigkeiten
+als größere Architekturen.
+
+Viele Modelle erreichen ihre beste
+Validierungsgenauigkeit deutlich vor dem Ende
+des Trainingslaufs.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\linewidth]{Trainingszeit.png}
+    \caption{Traingingtime per Epoch by Trainmode}
+    \label{fig:placeholder}
+\end{figure}
+
+\subsection{Zusammenfassung der Ergebnisse}
+
+Die experimentellen Ergebnisse zeigen:
+
+\begin{itemize}
+    \item ReLU-Modelle erzielen höhere Validierungsgenauigkeiten als Sigmoid-Modelle.
+    \item Mini-Batch-Training führt zu besseren Ergebnissen als Online Learning.
+    \item Zusätzliche Tiefe erhöht die Genauigkeit leicht.
+    \item Batch-Modelle sind schneller als Modelle ohne Batch-Verarbeitung.
+\end{itemize}

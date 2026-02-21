@@ -1,0 +1,99 @@
+% !TEX root = ../termpaper.tex
+% @author Frithjof Beims
+%
+
+\section{Theoretische Grundlagen}
+
+\subsection{Überwachtes Lernen}
+
+Beim überwachten Lernen wird ein Modell auf Basis gelabelter Trainingsdaten optimiert. 
+Gegeben ist eine Trainingsmenge
+
+\[
+\mathcal{D} = \{(x_i, y_i)\}_{i=1}^{N},
+\]
+
+wobei $x_i \in \mathbb{R}^d$ einen Eingabevektor und $y_i$ die zugehörige Klassenbezeichnung darstellt. 
+Ziel ist es, eine Funktion $f_\theta(x)$ mit Parametern $\theta$ zu bestimmen, 
+die neue Eingaben korrekt klassifiziert. \cite{Deeplearningchapter1}
+
+Im Fall des MNIST-Datensatzes handelt es sich um ein Mehrklassenproblem mit zehn Klassen (Ziffern 0–9).
+
+\subsection{Feedforward-Neuronale Netze} 
+
+Ein Fully Connected Neural Network besteht aus mehreren hintereinandergeschalteten Schichten.  
+Jede Schicht berechnet zunächst eine affine Transformation \cite{Deeplearningchapter1} \cite{Nahua2017Kang}
+
+\[
+z^{(l)} = W^{(l)} a^{(l-1)} + b^{(l)},
+\]
+
+gefolgt von einer nichtlinearen Aktivierungsfunktion (ReLU oder Sigmoid). Die Nichtlinearität ist notwendig, da mehrere rein lineare Transformationen wieder einer einzigen linearen Funktion entsprechen würden.
+
+\subsection{Aktivierungsfunktionen}
+
+In dieser Arbeit werden zwei Aktivierungsfunktionen untersucht.
+
+\subsubsection{Sigmoid}
+
+Die Sigmoid-Funktion ist definiert als
+
+\[
+\sigma(x) = \frac{1}{1 + e^{-x}}.
+\]
+
+Sie bildet Eingaben auf das Intervall $(0,1)$ ab. \cite{Deeplearningchapter1}
+Ein Nachteil besteht darin, dass für große Beträge von $x$ die Ableitung sehr klein wird, 
+was zu langsamer oder stagnierender Gradientenweitergabe führen kann (Vanishing Gradient).
+
+\subsubsection{ReLU}
+
+Die Rectified Linear Unit ist definiert als
+
+\[
+\text{ReLU}(x) = \max(0, x).
+\]
+
+Sie besitzt für positive Eingaben eine konstante Ableitung von 1 
+und reduziert dadurch das Risiko verschwindender Gradienten in tiefen Netzen. \cite{Sigmoid-vs-ReLU}
+
+\subsection{Softmax und Mehrklassenklassifikation}
+
+Für die Mehrklassenklassifikation wird im Ausgabelayer eine Softmax-Funktion verwendet:
+
+\[
+\text{Softmax}(z_i) = 
+\frac{e^{z_i}}{\sum_{j=1}^{K} e^{z_j}}.
+\]
+
+Sie transformiert die Ausgabewerte in eine Wahrscheinlichkeitsverteilung über die $K$ Klassen. \cite{Einfuehrung-in-Neuronale-Netze}
+
+\subsection{Verlustfunktionen}
+
+Zur Optimierung wird der Cross-Entropy-Loss verwendet:
+
+\[
+\mathcal{L} = - \sum_{i=1}^{K} y_i \log(\hat{y}_i).
+\]
+
+Dabei bezeichnet $y_i$ das One-Hot-Label und $\hat{y}_i$ die vorhergesagte Klassenwahrscheinlichkeit. \cite{Neural-Networks-Part-6:-Cross-Entropy}
+
+\subsection{Gradientenabstieg und Backpropagation}
+
+Die Modellparameter werden mittels Gradientenabstieg aktualisiert:
+
+\[
+\theta \leftarrow \theta - \eta \nabla_\theta \mathcal{L},
+\]
+
+wobei $\eta$ die Lernrate bezeichnet. \cite{DeepLearningChapter2}
+
+Die Berechnung der Gradienten erfolgt effizient durch Backpropagation, bei der die Ableitungen der Verlustfunktion schichtweise unter Anwendung der Kettenregel rückwärts durch das Netzwerk propagiert werden. \cite{DeepLearningChapter3} \cite{DeepLearningChapter4}
+
+\subsection{Online- und Mini-Batch-Training}
+
+Beim Online Learning erfolgt die Aktualisierung der Gewichte nach jedem einzelnen Trainingsbeispiel. 
+Dies führt zu hoher Gradientenvarianz, kann jedoch schnelle Anpassungen ermöglichen.
+
+Beim Mini-Batch-Training werden mehrere Trainingsbeispiele gemeinsam verarbeitet. 
+Die Gradienten werden über ein Batch gemittelt, wodurch stabilere Updates entstehen und die Varianz reduziert wird. \cite{Zhang2023}
