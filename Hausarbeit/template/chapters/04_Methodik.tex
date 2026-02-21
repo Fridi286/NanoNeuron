@@ -6,7 +6,7 @@
 
 \subsection{Implementierungsdetails}
 
-Das neuronale Netz wurde in Python implementiert. Als numerisches Backend wird NumPy verwendet. Die Implementierung umfasst Forward-Pass, Backpropagation, Online-Training sowie Mini-Batch-Training.
+Das neuronale Netz wurde in Python implementiert. Als numerisches Backend wird NumPy verwendet, optional auch CuPy für GPU-Betrieb. Die Implementierung umfasst Forward-Pass, Backpropagation, Online-Training sowie Mini-Batch-Training.
 
 Die Gewichtsmatrizen werden zu Beginn zufällig aus einer Gleichverteilung im Intervall $[-0.1, 0.1]$ initialisiert, 
 während die Bias-Vektoren mit Null initialisiert werden. 
@@ -18,7 +18,7 @@ Die Klassenlabels werden in One-Hot-Vektoren transformiert.
 Je nach Konfiguration werden unterschiedliche Aktivierungs- und Verlustfunktionen verwendet:
 
 \begin{itemize}
-    \item Sigmoid in allen Schichten mit quadratischer Fehlerfunktion (MSE),
+    \item Sigmoid in allen Schichten mit quadratischer Fehlerfunktion (MSE) im sampleweisen Training,
     \item ReLU in den Hidden Layern mit Softmax im Output-Layer und Cross-Entropy-Loss.
 \end{itemize}
 
@@ -28,11 +28,12 @@ Untersucht werden Fully Connected Netzwerke mit unterschiedlicher Tiefe und Brei
 Die Anzahl der Hidden Layer variiert zwischen ein- und mehrschichtigen Architekturen. 
 Die Anzahl der Neuronen pro Schicht wird systematisch variiert.
 
-Beispielhafte Architekturen umfassen:
+Die automatisiert getesteten Architekturen umfassen:
 
 \begin{itemize}
-    \item Ein Hidden Layer mit 16, 32, 64, 128 oder 256 Neuronen,
-    \item Zwei bis vier Hidden Layer mit unterschiedlichen Größenkombinationen.
+    \item Ein Hidden Layer mit 128, 256 oder 512 Neuronen,
+    \item Zwei Hidden Layer mit [32,32], [64,64] oder [128,64],
+    \item Drei bis vier Hidden Layer mit [256,128,64] bzw. [256,128,64,32].
 \end{itemize}
 
 Der Output-Layer besitzt stets zehn Neuronen entsprechend der zehn MNIST-Klassen, beziehungsweise der Zahlen von 0-9.
@@ -43,7 +44,7 @@ Es werden zwei Trainingsstrategien betrachtet:
 
 \begin{itemize}
     \item Online Learning (Batchgröße = 1),
-    \item Mini-Batch-Training mit Batchgrößen von 32 oder 64.
+    \item Mini-Batch-Training mit Batchgröße 32.
 \end{itemize}
 
 Beim Mini-Batch-Training werden die Trainingsdaten zu Beginn jeder Epoche zufällig permutiert. 
@@ -59,16 +60,16 @@ wobei $\eta$ die Lernrate bezeichnet.
 
 \subsection{Hyperparameter}
 
-Folgende Hyperparameter werden systematisch variiert:
+Im automatisierten Parallel-Experiment werden folgende Hyperparameter systematisch variiert:
 
 \begin{itemize}
-    \item Lernrate $\eta \in \{0.01, 0.025, 0.05, 0.1, 0.15, 0.2\}$,
-    \item Batchgröße $\in \{32, 64\}$ (bei Mini-Batch-Training),
+    \item Lernrate $\eta \in \{0.0001, 0.001, 0.01, 0.025, 0.05, 0.1\}$,
+    \item Batchgröße $=32$ (bei Mini-Batch-Training),
     \item Anzahl der Hidden Layer und Neuronenzahl pro Layer,
-    \item Seed.
+    \item Seed $=42$.
 \end{itemize}
 
-Die Anzahl der Epochen beträgt je nach Experiment 40 bis 50. 
+Die Anzahl der Epochen beträgt in den gezeigten Vergleichsläufen 50.
 
 \subsection{Evaluationskriterien}
 
@@ -76,18 +77,16 @@ Die Modellleistung wird anhand folgender Kennzahlen bewertet:
 
 \begin{itemize}
     \item Trainingsgenauigkeit,
-    \item Testgenauigkeit (Test Accuracy),
-    \item Validierungs-Loss (Validation Loss),
+    \item Testgenauigkeit,
+    \item Test-Loss,
     \item Generalisierungsgap (Differenz zwischen Trainings- und Testgenauigkeit),
     \item Konvergenzverlauf über die Epochen.
 \end{itemize}
 
-Die Testdaten werden nicht zur Parameteranpassung verwendet, 
-sondern ausschließlich zur Bewertung der Generalisierungsfähigkeit des Modells.
+Die Testdaten werden nicht zur Parameteranpassung verwendet, sondern ausschließlich zur Bewertung der Generalisierungsfähigkeit des Modells.
 
 \subsection{Versuchsdesign}
 
-Zur systematischen Analyse der Einflussfaktoren werden mehrere Konfigurationen automatisiert trainiert. 
-Die Trainingsläufe werden parallelisiert ausgeführt, wobei jede Konfiguration unabhängig trainiert und gespeichert wird.
+Zur systematischen Analyse der Einflussfaktoren werden mehrere Konfigurationen automatisiert trainiert. Die Trainingsläufe werden parallelisiert ausgeführt, wobei jede Konfiguration unabhängig trainiert und ihre Metriken fortlaufend gespeichert werden.
 
-Alle Experimente verwenden identische Trainings- und Testdatensplits. Nicht untersuchte Hyperparameter werden konstant gehalten, um die Effekte der Aktivierungsfunktion, Trainingsstrategie und Netztiefe isoliert zu betrachten.
+Alle Experimente verwenden identische Trainings- und Testdatensplits. Nicht untersuchte Hyperparameter werden konstant gehalten, um die Effekte von Trainingsstrategie und Architektur möglichst isoliert zu betrachten.
