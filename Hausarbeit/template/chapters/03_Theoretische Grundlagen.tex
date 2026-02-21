@@ -55,7 +55,7 @@ Die Rectified Linear Unit ist definiert als
 \]
 
 Sie besitzt für positive Eingaben eine konstante Ableitung von 1 
-und reduziert dadurch das Risiko verschwindender Gradienten in tiefen Netzen. \cite{Sigmoid-vs-ReLU}
+und reduziert dadurch das Risiko verschwindender Gradienten in tiefen Netzen. \cite{NairHinton2010}
 
 \subsection{Softmax und Mehrklassenklassifikation}
 
@@ -76,7 +76,7 @@ Zur Optimierung wird der Cross-Entropy-Loss verwendet:
 \mathcal{L} = - \sum_{i=1}^{K} y_i \log(\hat{y}_i).
 \]
 
-Dabei bezeichnet $y_i$ das One-Hot-Label und $\hat{y}_i$ die vorhergesagte Klassenwahrscheinlichkeit. \cite{Neural-Networks-Part-6:-Cross-Entropy}
+Dabei bezeichnet $y_i$ das One-Hot-Label und $\hat{y}_i$ die vorhergesagte Klassenwahrscheinlichkeit. \cite{Goodfellow-et-al-2016}
 
 \subsection{Gradientenabstieg und Backpropagation}
 
@@ -86,9 +86,9 @@ Die Modellparameter werden mittels Gradientenabstieg aktualisiert:
 \theta \leftarrow \theta - \eta \nabla_\theta \mathcal{L},
 \]
 
-wobei $\eta$ die Lernrate bezeichnet. \cite{DeepLearningChapter2}
+wobei $\eta$ die Lernrate bezeichnet. \cite{Goodfellow-et-al-2016}
 
-Die Berechnung der Gradienten erfolgt effizient durch Backpropagation, bei der die Ableitungen der Verlustfunktion schichtweise unter Anwendung der Kettenregel rückwärts durch das Netzwerk propagiert werden. \cite{DeepLearningChapter3} \cite{DeepLearningChapter4}
+Die Berechnung der Gradienten erfolgt effizient durch Backpropagation, bei der die Ableitungen der Verlustfunktion schichtweise unter Anwendung der Kettenregel rückwärts durch das Netzwerk propagiert werden. \cite{Rumelhart1986}
 
 \subsection{Online- und Mini-Batch-Training}
 
